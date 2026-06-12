@@ -13,7 +13,8 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       ticket_number: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        unique: true
       },
       qr_code: {
         type: Sequelize.TEXT

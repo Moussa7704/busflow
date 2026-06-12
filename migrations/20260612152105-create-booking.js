@@ -19,7 +19,8 @@ module.exports = {
         type: Sequelize.STRING
       },
       booking_reference: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        unique: true
       },
       status: {
         type: Sequelize.ENUM(

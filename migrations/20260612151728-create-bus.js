@@ -13,7 +13,8 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       plate_number: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        unique: true
       },
       bus_number: {
         type: Sequelize.STRING
