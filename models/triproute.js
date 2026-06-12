@@ -10,7 +10,10 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+     TripRoute.belongsTo(models.Compagny, {
+        foreignKey: "compagny_id",
+        as: "Compagnies"
+      })
     }
   }
   TripRoute.init({

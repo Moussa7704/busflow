@@ -9,10 +9,10 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      company_id: {
+      compagny_id: {
         type: Sequelize.INTEGER
       },
-      route_id: {
+      trip_route_id: {
         type: Sequelize.INTEGER
       },
       bus_id: {
