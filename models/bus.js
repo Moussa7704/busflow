@@ -12,8 +12,8 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
 
       Bus.belongsTo(models.Compagny, {
-        foreignKey: "company_id",
-        as: "company"
+        foreignKey: "compagny_id",
+        as: "compagny"
       });
 
       Bus.hasMany(models.Trip, {

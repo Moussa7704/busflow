@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Trip.belongsTo(models.Compagny, {
         foreignKey: "compagny_id",
-        as: "company"
+        as: "compagny"
       })
       Trip.belongsTo(models.TripRoute, {
         foreignKey: "trip_route_id",

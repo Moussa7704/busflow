@@ -11,23 +11,23 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       Compagny.hasMany(models.Agency, {
-        foreignKey: "company_id",
+        foreignKey: "compagny_id",
         as: "agencies"
       });
       Compagny.hasMany(models.User, {
-        foreignKey: "company_id",
+        foreignKey: "compagny_id",
         as: "users"
       });
       Compagny.hasMany(models.Bus, {
-        foreignKey: "company_id",
+        foreignKey: "compagny_id",
         as: "buses"
       });
       Compagny.hasMany(models.TripRoute, {
-        foreignKey: "company_id",
+        foreignKey: "compagny_id",
         as: "routes"
       });
       Compagny.hasMany(models.Trip, {
-        foreignKey: "company_id",
+        foreignKey: "compagny_id",
         as: "trips"
       });
     }

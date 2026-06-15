@@ -5,9 +5,8 @@ const app = express()
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 
+const authRoutes = require("./routes/auth")
 
-const testroutes = require('./routes/test')
-
-app.use('/api/v1', testroutes)
+app.use('/api/v1/auth', authRoutes)
 
 module.exports = app
