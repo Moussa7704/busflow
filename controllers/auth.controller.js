@@ -1,8 +1,6 @@
 const { User, Otp, RefreshToken } = require("../models")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
-const dotenv = require("dotenv")
-dotenv.config()
 
 const register = async (req, res) => {
 
@@ -109,7 +107,7 @@ const verifyOtp = async (req, res) => {
             process.env.ACCESS_SECRET,
             { expiresIn: '15m' }
         )
-        const refrehToken = jwt.sign(
+        const refreshToken = jwt.sign(
             { id: user.id },
             process.env.REFRESH_SECRET,
             { expiresIn: '7d' }
@@ -117,7 +115,7 @@ const verifyOtp = async (req, res) => {
 
         await RefreshToken.create({
             user_id: user.id,
-            token: refrehToken,
+            token: refreshToken,
             expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
         })
 
@@ -128,7 +126,7 @@ const verifyOtp = async (req, res) => {
             accessToken,
             refreshToken
         });
-    } catch (error) {
+    } catch (err) {
         return res.status(500).json({ error: err.message });
     }
 }
