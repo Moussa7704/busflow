@@ -25,7 +25,8 @@ module.exports = {
           "LOGIN",
           "RESET_PASSWORD",
           "PHONE_VERIFICATION",
-          "EMAIL_VERIFICATION"
+          "EMAIL_VERIFICATION",
+          "RESEND_OTP"
         ),
         allowNull: false
       },

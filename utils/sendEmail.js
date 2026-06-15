@@ -1,6 +1,14 @@
 const nodemailer = require('nodemailer');
-const { emailTemplate, resetTemplate } = require('../templates/otpEmail');
+const { emailTemplate, resetTemplate } = require('../templates/templates');
 require('dotenv').config();
+
+const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+})
 
 
 const sendOtpEmail = async (email, code) => {

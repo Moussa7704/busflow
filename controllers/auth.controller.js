@@ -2,6 +2,7 @@ const { User, Otp, RefreshToken } = require("../models")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
 const crypto = require('crypto');
+const { sendOtpEmail } = require('../utils/sendEmail');
 
 const register = async (req, res) => {
 
@@ -161,9 +162,21 @@ const refresh = async (req, res) => {
             process.env.ACCESS_SECRET,
             { expiresIn: '15m' }
         );
+        const newRefreshToken = jwt.sign(
+            { id: decoded.id },
+            process.env.REFRESH_SECRET,
+            { expiresIn: '7d' }
+        );
+
+        await RefreshToken.create({
+            user_id: decoded.id,
+            token: newRefreshToken,
+            expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        });
 
         res.json({
-            accessToken: newAccessToken
+            accessToken: newAccessToken,
+            refreshToken: newRefreshToken
         });
     } catch (err) {
         return res.status(403).json({
@@ -251,7 +264,7 @@ const forgetPassword = async (req, res) => {
 };
 const resetPassword = async (req, res) => {
     try {
-        const { token, password , confirm_password} = req.body;
+        const { token, password, confirm_password } = req.body;
 
         if (!token || !password || !confirm_password) {
             return res.status(400).json({ message: "Token et mot de passe requis" });
@@ -338,6 +351,7 @@ const resendOtp = async (req, res) => {
         //créer nouveau OTP
         await Otp.create({
             user_id,
+            type: "RESEND_OTP",
             code,
             expires_at: new Date(Date.now() + 10 * 60 * 1000)
         });
