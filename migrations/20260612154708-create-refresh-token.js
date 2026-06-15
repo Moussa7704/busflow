@@ -18,6 +18,9 @@ module.exports = {
       expires_at: {
         type: Sequelize.DATE
       },
+       revoked: {
+        type: Sequelize.BOOLEAN
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
