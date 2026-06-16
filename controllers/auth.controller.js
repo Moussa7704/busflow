@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt")
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { sendOtpEmail } = require('../utils/sendEmail');
-const { generateAccessToken, generateRefreshToken } = require("../utils/jwt");
+const { generateAccessToken, generateRefreshToken, verifyRefreshToken } = require("../utils/jwt");
 
 const register = async (req, res) => {
 
@@ -105,9 +105,9 @@ const verifyOtp = async (req, res) => {
 
         //  user.is_verified = true;
         // await user.save();
-        const data = {id:user.id}
-       const accessToken = generateAccessToken(data)
-       const refreshToken = generateRefreshToken(data)
+        const data = { id: user.id }
+        const accessToken = generateAccessToken(data)
+        const refreshToken = generateRefreshToken(data)
 
         await RefreshToken.create({
             user_id: user.id,
@@ -146,17 +146,15 @@ const refresh = async (req, res) => {
             return res.status(403).json({ message: "Token expired" });
         }
 
-        const decoded = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
+        const decoded = verifyRefreshToken(refreshToken)
 
         token.revoked = true;
         await token.save();
 
-        const data = {id:decoded.id}
-
-        const newAccessToken = generateAccessToken(data)
+        const newAccessToken = generateAccessToken(decoded.id)
 
         res.json({
-            newAccessToken
+            accessToken: newAccessToken
         });
     } catch (err) {
         return res.status(403).json({
@@ -211,11 +209,8 @@ const forgetPassword = async (req, res) => {
         });
 
         // Generate a unique token for password reset
-        const resetToken = jwt.sign(
-            { id: user.id },
-            process.env.RESET_SECRET,
-            { expiresIn: '1h' }
-        );
+        const resetToken = generateResetToken(user.id)
+
 
         const hashedToken = crypto
             .createHash("sha256")
