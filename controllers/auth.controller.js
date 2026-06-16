@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt")
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { sendOtpEmail } = require('../utils/sendEmail');
+const { generateAccessToken, generateRefreshToken } = require("../utils/jwt");
 
 const register = async (req, res) => {
 
@@ -104,16 +105,9 @@ const verifyOtp = async (req, res) => {
 
         //  user.is_verified = true;
         // await user.save();
-        const accessToken = jwt.sign(
-            { id: user.id },
-            process.env.ACCESS_SECRET,
-            { expiresIn: '15m' }
-        )
-        const refreshToken = jwt.sign(
-            { id: user.id },
-            process.env.REFRESH_SECRET,
-            { expiresIn: '7d' }
-        )
+        const data = {id:user.id}
+       const accessToken = generateAccessToken(data)
+       const refreshToken = generateRefreshToken(data)
 
         await RefreshToken.create({
             user_id: user.id,
@@ -157,14 +151,12 @@ const refresh = async (req, res) => {
         token.revoked = true;
         await token.save();
 
-        const newAccessToken = jwt.sign(
-            { id: decoded.id },
-            process.env.ACCESS_SECRET,
-            { expiresIn: '15m' }
-        );
+        const data = {id:decoded.id}
+
+        const newAccessToken = generateAccessToken(data)
 
         res.json({
-            accessToken: newAccessToken
+            newAccessToken
         });
     } catch (err) {
         return res.status(403).json({
