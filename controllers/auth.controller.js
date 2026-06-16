@@ -1,6 +1,6 @@
 const { User, Otp, RefreshToken } = require("../models")
 const bcrypt = require("bcrypt")
-const jwt = require("jsonwebtoken")
+const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { sendOtpEmail } = require('../utils/sendEmail');
 
@@ -140,43 +140,31 @@ const refresh = async (req, res) => {
             return res.status(401).json({ message: "No token" });
         }
 
-        const storedToken = await RefreshToken.findOne({
+        const token = await RefreshToken.findOne({
             where: { token: refreshToken, revoked: false }
         });
 
-        if (!storedToken) {
+        if (!token) {
             return res.status(403).json({ message: "Invalid refresh token" });
         }
 
-        if (new Date() > storedToken.expires_at) {
+        if (new Date() > token.expires_at) {
             return res.status(403).json({ message: "Token expired" });
         }
 
         const decoded = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
 
-        storedToken.revoked = true;
-        await storedToken.save();
+        token.revoked = true;
+        await token.save();
 
         const newAccessToken = jwt.sign(
             { id: decoded.id },
             process.env.ACCESS_SECRET,
             { expiresIn: '15m' }
         );
-        const newRefreshToken = jwt.sign(
-            { id: decoded.id },
-            process.env.REFRESH_SECRET,
-            { expiresIn: '7d' }
-        );
-
-        await RefreshToken.create({
-            user_id: decoded.id,
-            token: newRefreshToken,
-            expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-        });
 
         res.json({
-            accessToken: newAccessToken,
-            refreshToken: newRefreshToken
+            accessToken: newAccessToken
         });
     } catch (err) {
         return res.status(403).json({

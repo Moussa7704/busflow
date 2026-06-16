@@ -8,7 +8,9 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "migrate": "sequelize db:migrate",
+    "undo-all":"sequelize db:migrate:undo:all",
+    "seed":"sequelize db:seed:all"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
