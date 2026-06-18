@@ -6,8 +6,8 @@ const compagnyController = require("../controllers/compagny.controller")
 
 //Compagny
 router.post('/compagnies', compagnyController.createCompagny)
-router.get('/compagnies/paginate', compagnyController.listCompagny)
-router.get('/compagnies', compagnyController.listCompagnyPaginate)
+router.get('/compagnies', compagnyController.listCompagny)
+router.get('/compagnies/paginate', compagnyController.listCompagnyPaginate)
 router.put('/:id', compagnyController.updateCompagny)
 router.delete('/:id', compagnyController.deleteCompagny)
 
