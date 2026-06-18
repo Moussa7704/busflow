@@ -16,7 +16,11 @@ module.exports = (sequelize, DataTypes) => {
   RefreshToken.init({
     user_id: DataTypes.INTEGER,
     token: DataTypes.TEXT,
-    expires_at: DataTypes.DATE
+    expires_at: DataTypes.DATE,
+     revoked: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    }
   }, {
     sequelize,
     modelName: 'RefreshToken',
