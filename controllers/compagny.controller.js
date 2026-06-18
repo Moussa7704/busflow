@@ -17,7 +17,7 @@ const createCompagny = async (req, res) => {
 
 const getAllCompanies = async (req, res) => {
     try {
-        const companies = await compagnyService.findAll()
+        const companies = await compagnyService.getAll()
 
         return res.status(200).json({
             data: companies

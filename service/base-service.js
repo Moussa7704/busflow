@@ -8,9 +8,6 @@ class BaseService {
     }
 
     async getAll(options = {}) {
-        return await this.model.getAll(options)
-    }
-    async findAll(options = {}) {
         return await this.model.findAll(options)
     }
     async getById(id, options = {}) {
