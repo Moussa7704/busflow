@@ -1,6 +1,6 @@
 const compagnyService = require("../service/compagny.service")
 
-const createCompagny = async (req, res) => {
+const create = async (req, res) => {
     try {
         const compagny = await compagnyService.create(req.body)
 
@@ -15,12 +15,34 @@ const createCompagny = async (req, res) => {
     }
 }
 
-const getAllCompanies = async (req, res) => {
+const get = async (req, res) => {
     try {
-        const companies = await compagnyService.getAll()
+        const companies = await compagnyService.get()
 
         return res.status(200).json({
             data: companies
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            error: error.message
+        })
+    }
+}
+
+const update = async (req, res) => {
+    try {
+        const compagny = await compagnyService.update(req.params.id, req.body)
+
+        if (!compagny) {
+            return res.status(404).json({
+                message: "Compagnie introuvable"
+            })
+        }
+
+        return res.status(200).json({
+            message: "Compagnie mise à jour",
+            data: compagny
         })
 
     } catch (error) {
@@ -48,9 +70,33 @@ const getCompanies = async (req, res) => {
     }
 }
 
+const deleteCompagny = async (req, res) => {
+    try {
+        const result = await compagnyService.delete(req.params.id)
+
+        if (!result) {
+            return res.status(404).json({
+                message: "Compagnie introuvable"
+            })
+        }
+
+        return res.status(200).json({
+            message: "Compagnie supprimée"
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            error: error.message
+        })
+    }
+}
+
 
 module.exports = {
-    createCompagny,
+    create,
+    get,
+    update,
     getCompanies,
-    getAllCompanies
+    deleteCompagny
+    
 }

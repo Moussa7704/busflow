@@ -7,21 +7,22 @@ class BaseService {
         return await this.model.create(data)
     }
 
-    async getAll(options = {}) {
+    async get(options = {}) {
         return await this.model.findAll(options)
     }
+
     async getById(id, options = {}) {
-        return await this.model.getByPk(id, options)
+        return await this.model.findByPk(id, options)
     }
     async update(id, data) {
-        const record = await this.model.getByPk(id)
+        const record = await this.model.findByPk(id)
 
         if (!record) return null
 
         return await record.update(data)
     }
     async delete(id) {
-        const record = await this.model.getByPk(id)
+        const record = await this.model.findByPk(id)
 
         if (!record) return null
 
