@@ -5,9 +5,9 @@ const { authenticate, authorize } = require('../middlewares/auth')
 const compagnyController = require("../controllers/compagny.controller")
 
 //Compagny
-router.post('/compagnies', compagnyController.createCompagny)
-router.get('/compagnies', compagnyController.listCompagny)
-router.get('/compagnies/paginate', compagnyController.listCompagnyPaginate)
+router.post('/companies', compagnyController.createCompagny)
+router.get('/companies', compagnyController.listCompagny)
+router.get('/companies/paginate', compagnyController.listCompagnyPaginate)
 router.put('/:id', compagnyController.updateCompagny)
 router.delete('/:id', compagnyController.deleteCompagny)
 
@@ -23,7 +23,6 @@ router.delete('/:id', compagnyController.deleteCompagny)
  * /companies:
  *   post:
  *     summary: Créer une compagnie
- *     tags: [Companies]
  *     requestBody:
  *       required: true
  *       content:
@@ -60,7 +59,6 @@ router.delete('/:id', compagnyController.deleteCompagny)
  * /companies:
  *   get:
  *     summary: Lister toutes les compagnies
- *     tags: [Companies]
  *     responses:
  *       200:
  *         description: Liste des compagnies
@@ -70,7 +68,6 @@ router.delete('/:id', compagnyController.deleteCompagny)
  * /companies/paginate:
  *   get:
  *     summary: Liste paginée des compagnies
- *     tags: [Companies]
  *     parameters:
  *       - in: query
  *         name: page
@@ -91,7 +88,6 @@ router.delete('/:id', compagnyController.deleteCompagny)
  * /companies/{id}:
  *   put:
  *     summary: Modifier une compagnie
- *     tags: [Companies]
  *     parameters:
  *       - in: path
  *         name: id
@@ -126,7 +122,6 @@ router.delete('/:id', compagnyController.deleteCompagny)
  * /companies/{id}:
  *   delete:
  *     summary: Supprimer une compagnie
- *     tags: [Companies]
  *     parameters:
  *       - in: path
  *         name: id
