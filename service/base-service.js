@@ -7,7 +7,7 @@ class BaseService {
         return await this.model.create(data)
     }
 
-    async get(options = {}) {
+    async list(options = {}) {
         return await this.model.findAll(options)
     }
 
@@ -30,7 +30,7 @@ class BaseService {
         return true
     }
 
-    async paginate(page = 1, limit = 10, options = {}) {
+    async Paginate(page = 1, limit = 10, options = {}) {
         const offset = (page - 1) * limit
 
         const { count, rows } = await this.model.findAndCountAll({

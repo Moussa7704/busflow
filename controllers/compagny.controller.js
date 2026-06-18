@@ -1,6 +1,6 @@
 const compagnyService = require("../service/compagny.service")
 
-const create = async (req, res) => {
+const createCompagny = async (req, res) => {
     try {
         const compagny = await compagnyService.create(req.body)
 
@@ -15,9 +15,9 @@ const create = async (req, res) => {
     }
 }
 
-const get = async (req, res) => {
+const listCompagny = async (req, res) => {
     try {
-        const companies = await compagnyService.get()
+        const companies = await compagnyService.list()
 
         return res.status(200).json({
             data: companies
@@ -30,7 +30,7 @@ const get = async (req, res) => {
     }
 }
 
-const update = async (req, res) => {
+const updateCompagny = async (req, res) => {
     try {
         const compagny = await compagnyService.update(req.params.id, req.body)
 
@@ -52,11 +52,11 @@ const update = async (req, res) => {
     }
 }
 
-const getCompanies = async (req, res) => {
+const listCompagnyPaginate = async (req, res) => {
     try {
         const { page, limit } = req.query
 
-        const result = await compagnyService.paginate(
+        const result = await compagnyService.Paginate(
             page || 1,
             limit || 10
         )
@@ -93,10 +93,9 @@ const deleteCompagny = async (req, res) => {
 
 
 module.exports = {
-    create,
-    get,
-    update,
-    getCompanies,
+    createCompagny,
+    listCompagny,
+    updateCompagny,
+    listCompagnyPaginate,
     deleteCompagny
-    
 }
