@@ -19,6 +19,7 @@ module.exports = (sequelize, DataTypes) => {
   Ticket.init({
     booking_id: DataTypes.INTEGER,
     ticket_number: DataTypes.STRING,
+    compagny_id: DataTypes.INTEGER,
     qr_code: DataTypes.TEXT,
     used: DataTypes.BOOLEAN
   }, {

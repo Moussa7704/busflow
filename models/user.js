@@ -18,6 +18,14 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "user_id",
         as: "otps"
       });
+      User.belongsTo(models.Role, {
+        foreignKey: "role_id",
+        as: "Role"
+      });
+      User.belongsTo(models.Agency, {
+        foreignKey: "agency_id",
+        as: "agency"
+      });
     }
   }
   User.init({

@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Bus.init({
-    company_id: DataTypes.INTEGER,
+    compagny_id: DataTypes.INTEGER,
     plate_number: DataTypes.STRING,
     bus_number: DataTypes.STRING,
     capacity: DataTypes.INTEGER,

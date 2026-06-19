@@ -19,11 +19,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "agency_id",
         as: "users"
       });
-
     }
   }
   Agency.init({
-    company_id: DataTypes.INTEGER,
+    compagny_id: DataTypes.INTEGER,
     name: DataTypes.STRING,
     city: DataTypes.STRING,
     address: DataTypes.STRING,

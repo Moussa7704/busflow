@@ -15,21 +15,21 @@ module.exports = (sequelize, DataTypes) => {
         as: "compagny"
       })
       Trip.belongsTo(models.TripRoute, {
-        foreignKey: "trip_route_id",
+        foreignKey: "route_id",
         as: "TripRoute"
       })
       Trip.belongsTo(models.Bus, {
         foreignKey: "bus_id",
-        as: "Buses"
+        as: "bus"
       })
-      Trip.belongsTo(models.Booking, {
+      Trip.hasMany(models.Booking, {
         foreignKey: "trip_id",
         as: "bookings"
-      })
+      });
     }
   }
   Trip.init({
-    company_id: DataTypes.INTEGER,
+    compagny_id: DataTypes.INTEGER,
     route_id: DataTypes.INTEGER,
     bus_id: DataTypes.INTEGER,
     departure_time: DataTypes.DATE,

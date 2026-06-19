@@ -12,7 +12,7 @@ module.exports = {
       compagny_id: {
         type: Sequelize.INTEGER
       },
-      trip_route_id: {
+      route_id: {
         type: Sequelize.INTEGER
       },
       bus_id: {

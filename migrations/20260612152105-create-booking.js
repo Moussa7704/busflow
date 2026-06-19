@@ -15,6 +15,9 @@ module.exports = {
       passenger_id: {
         type: Sequelize.INTEGER
       },
+       compagny_id: {
+        type: Sequelize.INTEGER
+      },
       seat_number: {
         type: Sequelize.STRING
       },

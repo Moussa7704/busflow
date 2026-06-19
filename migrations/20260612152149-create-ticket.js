@@ -9,6 +9,9 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+       compagny_id: {
+        type: Sequelize.INTEGER
+      },
       booking_id: {
         type: Sequelize.INTEGER
       },
