@@ -17,7 +17,8 @@ const register = async (req, res) => {
         last_name: req.body.last_name,
         phone: req.body.phone,
         email: req.body.email,
-        password: hashedPassword
+        password: hashedPassword,
+        is_active: req.body.is_active
     }
     const user = await User.findOne({ where: { email: payload.email } })
 
