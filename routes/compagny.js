@@ -5,11 +5,11 @@ const { authenticate, authorize } = require("../middlewares/auth");
 const compagnyController = require("../controllers/compagny.controller");
 
 // Companies
-router.post("/companies",authenticate,authorize("SUPER_ADMIN"),compagnyController.createCompagny)
-router.get("/companies", compagnyController.listCompagny);
-router.get("/companies/paginate",compagnyController.listCompagnyPaginate);
-router.put("/companies/:id",authenticate,authorize("SUPER_ADMIN"),compagnyController.updateCompagny);
-router.delete("/companies/:id",authenticate,authorize("SUPER_ADMIN"),compagnyController.deleteCompagny);
+router.post("/compagnies",authenticate,authorize("SUPER_ADMIN"),compagnyController.createCompagny)
+router.get("/compganies", compagnyController.listCompagny);
+router.get("/compganies/paginate",compagnyController.listCompagnyPaginate);
+router.put("/compganies/:id",authenticate,authorize("SUPER_ADMIN"),compagnyController.updateCompagny);
+router.delete("/compganies/:id",authenticate,authorize("SUPER_ADMIN"),compagnyController.deleteCompagny);
 
 /**
  * @swagger
