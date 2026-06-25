@@ -21,8 +21,10 @@ app.use('/api/v1/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec,
 
 const authRoutes = require("./routes/auth")
 const compagnyRoutes = require("./routes/compagny")
+const agencyRoutes = require("./routes/agency")
 
 app.use('/api/v1/auth', authRoutes)
 app.use('/api/v1', compagnyRoutes)
+app.use('/api/v1', agencyRoutes)
 
 module.exports = app

@@ -6,10 +6,9 @@ const compagnyController = require("../controllers/compagny.controller");
 
 // Companies
 router.post("/compagnies",authenticate,authorize("SUPER_ADMIN"),compagnyController.createCompagny)
-router.get("/compganies", compagnyController.listCompagny);
-router.get("/compganies/paginate",compagnyController.listCompagnyPaginate);
-router.put("/compganies/:id",authenticate,authorize("SUPER_ADMIN"),compagnyController.updateCompagny);
-router.delete("/compganies/:id",authenticate,authorize("SUPER_ADMIN"),compagnyController.deleteCompagny);
+router.get("/compagnies", compagnyController.listCompagny);
+router.put("/compgagnies/:id",authenticate,authorize("SUPER_ADMIN"),compagnyController.updateCompagny);
+router.delete("/compagnies/:id",authenticate,authorize("SUPER_ADMIN"),compagnyController.deleteCompagny);
 
 /**
  * @swagger

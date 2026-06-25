@@ -17,16 +17,24 @@ const createCompagny = async (req, res) => {
 
 const listCompagny = async (req, res) => {
     try {
-        const companies = await compagnyService.list()
 
-        return res.status(200).json({
-            data: companies
-        })
+        const result = await compagnyService.Paginate(
+            req.query.page || 1,
+            req.query.limit || 10,
+            {
+                search: req.query.search,
+                status: req.query.status
+            }
+        );
+
+        return res.status(200).json(result);
 
     } catch (error) {
+
         return res.status(500).json({
             error: error.message
-        })
+        });
+
     }
 }
 
@@ -44,24 +52,6 @@ const updateCompagny = async (req, res) => {
             message: "Compagnie mise à jour",
             data: compagny
         })
-
-    } catch (error) {
-        return res.status(500).json({
-            error: error.message
-        })
-    }
-}
-
-const listCompagnyPaginate = async (req, res) => {
-    try {
-        const { page, limit } = req.query
-
-        const result = await compagnyService.Paginate(
-            page || 1,
-            limit || 10
-        )
-
-        return res.status(200).json(result)
 
     } catch (error) {
         return res.status(500).json({
@@ -96,6 +86,5 @@ module.exports = {
     createCompagny,
     listCompagny,
     updateCompagny,
-    listCompagnyPaginate,
     deleteCompagny
 }

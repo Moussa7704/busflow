@@ -1,5 +1,6 @@
 const { Compagny } = require('../models');
 const BaseService = require('./base-service');
+const { Op } = require("sequelize")
 
 
 class CompagnyService extends BaseService {
@@ -43,6 +44,27 @@ class CompagnyService extends BaseService {
         }
 
         return await compagny.update(data)
+    }
+
+    async Paginate(page = 1, limit = 10, filters = {}) {
+
+        const where = {};
+
+        if (filters.status) {
+            where.status = filters.status;
+        }
+
+        if (filters.search) {
+            where.name = {
+                [Op.iLike]: `%${filters.search}%`
+            };
+        }
+
+        return await super.Paginate(
+            page,
+            limit,
+            { where }
+        );
     }
 
 }

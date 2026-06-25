@@ -30,6 +30,14 @@ class BaseService {
         return true
     }
 
+    async findOne(options = {}) {
+        return await this.model.findOne(options);
+    }
+
+    async count(options = {}) {
+        return await this.model.count(options);
+    }
+
     async Paginate(page = 1, limit = 10, options = {}) {
         const offset = (page - 1) * limit
 
