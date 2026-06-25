@@ -25,7 +25,12 @@ const authenticate = async (req, res, next) => {
             })
         }
 
-        req.user = user
+        req.user = {
+            id: user.id,
+            company_id: user.company_id,
+            agency_id: user.agency_id,
+            role: user.Role?.name
+        }
         next()
     } catch (error) {
         if (error.name === 'TokenExpiredError') {
@@ -42,11 +47,13 @@ const authenticate = async (req, res, next) => {
 
 const authorize = (...roles) => {
     return (req, res, next) => {
-        if (!req.user?.Role?.name || !roles.includes(req.user.Role.name)) {
+
+        if (!roles.includes(req.user.role)) {
             return res.status(403).json({
                 message: "Accès refusé"
             })
         }
+
         next()
     }
 }

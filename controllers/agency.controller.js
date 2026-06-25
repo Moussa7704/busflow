@@ -3,7 +3,12 @@ const agencyService = require("../service/agency.service");
 const createAgency = async (req, res) => {
     try {
 
-        const agency = await agencyService.create(req.body);
+        const payload = {
+            ...req.body,
+            company_id: req.user.company_id
+        }
+
+        const agency = await agencyService.create(payload);
 
         return res.status(201).json({
             message: "Agence créée avec succès",
