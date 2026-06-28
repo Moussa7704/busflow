@@ -4,9 +4,13 @@ const createAgency = async (req, res) => {
     try {
 
         const payload = {
-            ...req.body,
-            company_id: req.user.company_id
+            name: req.body.name,
+            city: req.body.city,
+            address: req.body.address,
+            phone: req.body.phone,
+            compagny_id: req.user.compagny_id
         }
+
 
         const agency = await agencyService.create(payload);
 
@@ -24,17 +28,25 @@ const createAgency = async (req, res) => {
 
 const listAgency = async (req, res) => {
     try {
+        const where = {};
 
-        const result = await agencyService.Paginate(
-            req.query.page,
-            req.query.limit,
-            {
-                company_id: req.query.company_id,
-                search: req.query.search
-            }
-        );
+        // 🔒 filtrage automatique SaaS
+        if (req.user.role !== "SUPER_ADMIN") {
+            where.company_id = req.user.company_id;
+        }
 
-        return res.status(200).json(result);
+        const agencies = await agencyService.list({ where });
+
+        // const result = await agencyService.Paginate(
+        //     req.query.page,
+        //     req.query.limit,
+        //     {
+        //         company_id: req.query.company_id,
+        //         search: req.query.search
+        //     }
+        // );
+
+        return res.status(200).json(agencies);
 
     } catch (error) {
 

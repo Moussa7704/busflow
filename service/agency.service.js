@@ -14,9 +14,9 @@ class AgencyService extends BaseService {
         })
 
         if (agency) {
-            return res.status(400).json({
-                message: 'Une agence avec ce nom existe déjà dans cette compagnie'
-            })
+            throw new Error(
+                "Une agence avec ce nom existe déjà dans cette compagnie"
+            );
         }
         return super.create(data)
     }

@@ -11,27 +11,28 @@ const {
 router.post(
     '/',
     authenticate,
-    authorize('SUPER_ADMIN', 'COMPANY_ADMIN'),
+    authorize('SUPER_ADMIN'),
     agencyController.createAgency
 );
 
 router.get(
     '/',
     authenticate,
+    authorize("SUPER_ADMIN"),
     agencyController.listAgency
 );
 
 router.put(
     '/:id',
     authenticate,
-    authorize('SUPER_ADMIN', 'COMPANY_ADMIN'),
+    authorize('SUPER_ADMIN'),
     agencyController.updateAgency
 );
 
 router.delete(
     '/:id',
     authenticate,
-    authorize('SUPER_ADMIN', 'COMPANY_ADMIN'),
+    authorize('SUPER_ADMIN'),
     agencyController.deleteAgency
 );
 

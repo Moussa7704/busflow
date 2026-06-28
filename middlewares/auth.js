@@ -24,13 +24,13 @@ const authenticate = async (req, res, next) => {
                 message: "Utilisateur introuvable ou inactif"
             })
         }
-
         req.user = {
             id: user.id,
-            company_id: user.company_id,
+            compagny_id: user.compagny_id,
             agency_id: user.agency_id,
             role: user.Role?.name
         }
+
         next()
     } catch (error) {
         if (error.name === 'TokenExpiredError') {

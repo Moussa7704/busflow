@@ -24,7 +24,7 @@ const compagnyRoutes = require("./routes/compagny")
 const agencyRoutes = require("./routes/agency")
 
 app.use('/api/v1/auth', authRoutes)
-app.use('/api/v1', compagnyRoutes)
-app.use('/api/v1', agencyRoutes)
+app.use('/api/v1/compagnies', compagnyRoutes)
+app.use('/api/v1/agency', agencyRoutes)
 
 module.exports = app
