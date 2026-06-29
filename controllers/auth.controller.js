@@ -37,7 +37,6 @@ const register = async (req, res) => {
             res.status(400).json({ error: err.message })
         })
 }
-
 const login = async (req, res) => {
     const payload = {
         email: req.body.email,
@@ -76,7 +75,6 @@ const login = async (req, res) => {
         expires_at: expiresAt
     });
 }
-
 const verifyOtp = async (req, res) => {
     try {
         const payload = {
@@ -96,7 +94,9 @@ const verifyOtp = async (req, res) => {
                 message: "OTP expiré"
             });
         }
-        const user = await User.findByPk(otp.user_id)
+        const user = await User.findByPk(otp.user_id, {
+            include: ['Role']
+        })
 
         if (!user) {
             return res.status(400).json({
@@ -154,10 +154,15 @@ const refresh = async (req, res) => {
 
         const decoded = verifyRefreshToken(refreshToken)
 
-        token.revoked = true;
-        await token.save();
+        //token.revoked = true;
+        //await token.save();
 
-        const newAccessToken = generateAccessToken(decoded.id)
+        const newAccessToken = generateAccessToken({
+            id: decoded.id,
+            role: decoded.role,
+            compagny_id: decoded.compagny_id,
+            agency_id: decoded.agency_id
+        });
 
         res.json({
             accessToken: newAccessToken
