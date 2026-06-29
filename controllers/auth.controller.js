@@ -5,48 +5,6 @@ const crypto = require('crypto');
 const { sendOtpEmail } = require('../utils/sendEmail');
 const { generateAccessToken, generateRefreshToken, verifyRefreshToken } = require("../utils/jwt");
 
-const register = async (req, res) => {
-
-    const hashedPassword = await bcrypt.hash(req.body.password, 10)
-
-    let compagny_id = req.user.compagny_id;
-
-    // Seul le SUPER_ADMIN peut choisir la compagnie
-    if (req.user.Role.name === "SUPER_ADMIN") {
-        compagny_id = req.body.compagny_id;
-    } else {
-        // COMPANY_ADMIN utilise automatiquement sa compagnie
-        compagny_id = req.user.compagny_id;
-    }
-
-    const payload = {
-        compagny_id: req.body.compagny_id,
-        agency_id: req.body.agency_id,
-        role_id: req.body.role_id,
-        first_name: req.body.first_name,
-        last_name: req.body.last_name,
-        phone: req.body.phone,
-        email: req.body.email,
-        password: hashedPassword,
-        is_active: req.body.is_active
-    }
-    const user = await User.findOne({ where: { email: payload.email } })
-
-    if (user) {
-        return res.status(400).json({
-            message: "lutilisateur existe déjà avec cet email"
-        })
-    }
-    User.create(payload)
-        .then(user => {
-            res.status(200).json({
-                message: "l'utilisateur a été créé avec succès"
-            })
-        })
-        .catch(err => {
-            res.status(400).json({ error: err.message })
-        })
-}
 const login = async (req, res) => {
     const payload = {
         email: req.body.email,
@@ -366,7 +324,6 @@ const resendOtp = async (req, res) => {
     }
 };
 module.exports = {
-    register,
     login,
     verifyOtp,
     refresh,

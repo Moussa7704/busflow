@@ -21,7 +21,7 @@ class UserService extends BaseService {
 
         let compagny_id;
 
-        if (currentUser?.Role?.name === "SUPER_ADMIN") {
+        if (currentUser?.role === "SUPER_ADMIN") {
 
             if (!data.compagny_id) {
                 throw new Error("La compagnie est obligatoire.");

@@ -9,7 +9,7 @@ const createAgency = async (req, res) => {
         if (req.user.role === "SUPER_ADMIN") {
             compagny_id = req.body.compagny_id;
         }
-
+        console.log("USER =>", req.user);
         const payload = {
             name: req.body.name,
             city: req.body.city,

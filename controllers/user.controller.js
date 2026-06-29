@@ -6,7 +6,9 @@ const { sendResponse } = require("../utils/message")
 const createUser = async (req, res) => {
     try {
 
+        
         const user = await userService.create(req.body, req.user)
+
 
         return sendResponse(res, {
             message: "Utilisateur créé avec succès",
