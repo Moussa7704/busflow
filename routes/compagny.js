@@ -82,6 +82,47 @@ router.delete("/:id",authenticate,authorize("SUPER_ADMIN"),compagnyController.de
  *         description: Liste paginée des compagnies
  */
 
+ /**
+  * @swagger
+  * /companies/{id}:
+  *   get:
+  *     summary: Récupérer une compagnie par ID
+  *     tags: [Companies]
+  *     security:
+  *       - bearerAuth: []
+  *     parameters:
+  *       - in: path
+  *         name: id
+  *         required: true
+  *         schema:
+  *           type: integer
+  *         description: ID de la compagnie
+  *     responses:
+  *       200:
+  *         description: Compagnie récupérée avec succès
+  *         content:
+  *           application/json:
+  *             schema:
+  *               type: object
+  *               properties:
+  *                 success:
+  *                   type: boolean
+  *                   example: true
+  *                 message:
+  *                   type: string
+  *                   example: Compagnie récupérée
+  *                 data:
+  *                   $ref: '#/components/schemas/Company'
+  *       404:
+  *         description: Compagnie introuvable
+  *       401:
+  *         description: Non authentifié
+  *       403:
+  *         description: Accès refusé
+  *       500:
+  *         description: Erreur serveur
+  */
+ 
 /**
  * @swagger
  * /companies/{id}:

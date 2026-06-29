@@ -5,39 +5,6 @@ const crypto = require('crypto');
 const { sendOtpEmail } = require('../utils/sendEmail');
 const { generateAccessToken, generateRefreshToken, verifyRefreshToken } = require("../utils/jwt");
 
-const register = async (req, res) => {
-
-    const hashedPassword = await bcrypt.hash(req.body.password, 10)
-
-    const payload = {
-        compagny_id: req.body.compagny_id,
-        agency_id: req.body.agency_id,
-        role_id: req.body.role_id,
-        first_name: req.body.first_name,
-        last_name: req.body.last_name,
-        phone: req.body.phone,
-        email: req.body.email,
-        password: hashedPassword,
-        is_active: req.body.is_active
-    }
-    const user = await User.findOne({ where: { email: payload.email } })
-
-    if (user) {
-        return res.status(400).json({
-            message: "lutilisateur existe déjà avec cet email"
-        })
-    }
-    User.create(payload)
-        .then(user => {
-            res.status(200).json({
-                message: "l'utilisateur a été créé avec succès"
-            })
-        })
-        .catch(err => {
-            res.status(400).json({ error: err.message })
-        })
-}
-
 const login = async (req, res) => {
     const payload = {
         email: req.body.email,
@@ -76,7 +43,6 @@ const login = async (req, res) => {
         expires_at: expiresAt
     });
 }
-
 const verifyOtp = async (req, res) => {
     try {
         const payload = {
@@ -96,7 +62,9 @@ const verifyOtp = async (req, res) => {
                 message: "OTP expiré"
             });
         }
-        const user = await User.findByPk(otp.user_id)
+        const user = await User.findByPk(otp.user_id, {
+            include: ['Role']
+        })
 
         if (!user) {
             return res.status(400).json({
@@ -106,7 +74,12 @@ const verifyOtp = async (req, res) => {
 
         //  user.is_verified = true;
         // await user.save();
-        const data = { id: user.id }
+        const data = {
+            id: user.id,
+            role: user.Role?.name,
+            compagny_id: user.compagny_id,
+            agency_id: user.agency_id
+        };
         const accessToken = generateAccessToken(data)
         const refreshToken = generateRefreshToken(data)
 
@@ -149,10 +122,15 @@ const refresh = async (req, res) => {
 
         const decoded = verifyRefreshToken(refreshToken)
 
-        token.revoked = true;
-        await token.save();
+        //token.revoked = true;
+        //await token.save();
 
-        const newAccessToken = generateAccessToken(decoded.id)
+        const newAccessToken = generateAccessToken({
+            id: decoded.id,
+            role: decoded.role,
+            compagny_id: decoded.compagny_id,
+            agency_id: decoded.agency_id
+        });
 
         res.json({
             accessToken: newAccessToken
@@ -346,7 +324,6 @@ const resendOtp = async (req, res) => {
     }
 };
 module.exports = {
-    register,
     login,
     verifyOtp,
     refresh,

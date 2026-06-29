@@ -8,6 +8,8 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.js",
+    "drop": "sequelize db:drop",
+    "create": "sequelize db:create",
     "migrate": "sequelize db:migrate",
     "undo-all": "sequelize db:migrate:undo:all",
     "seed": "sequelize db:seed:all"

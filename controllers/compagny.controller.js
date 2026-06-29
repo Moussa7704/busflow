@@ -1,26 +1,28 @@
-const compagnyService = require("../service/compagny.service")
+const compagnyService = require("../service/compagny.service");
+const { sendResponse } = require("../utils/message");
 
 const createCompagny = async (req, res) => {
     try {
         const compagny = await compagnyService.create(req.body)
 
-        return res.status(201).json({
-            success: true,
+        return sendResponse(res, {
             message: "Compagnie créée avec succès",
-            data: compagny
-        })
+            data: compagny,
+            status: 201
+        });
+
     } catch (error) {
-        return res.status(400).json({
+        return sendResponse(res, {
             success: false,
-            message: error.message
+            message: error.message,
+            status: 500
         });
     }
 }
-
 const listCompagny = async (req, res) => {
     try {
 
-        const result = await compagnyService.Paginate(
+        const compagny = await compagnyService.Paginate(
             req.query.page || 1,
             req.query.limit || 10,
             {
@@ -29,18 +31,18 @@ const listCompagny = async (req, res) => {
             }
         );
 
-        return res.status(200).json({
-            success: true,
+        return sendResponse(res, {
             message: "Liste des compagnies",
-            data: result.data,
-            pagination: result.pagination
+            data: compagny.data,
+            pagination: compagny.pagination,
+            status: 200
         });
 
     } catch (error) {
-
-        return res.status(500).json({
+        return sendResponse(res, {
             success: false,
-            message: error.message
+            message: error.message,
+            status: 500
         });
     }
 }
@@ -51,24 +53,26 @@ const getCompagnyById = async (req, res) => {
         const compagny = await compagnyService.getById(req.params.id);
 
         if (!compagny) {
-            return res.status(404).json({
-                message: "Compagnie introuvable"
-            });
+            return sendResponse(res, {
+                success: false,
+                message: 'Compagnie introuvable',
+                status: 404
+            })
         }
 
-        return res.status(200).json({
-            success: true,
+        return sendResponse(res, {
             message: "Compagnie récupérée",
-            data: compagny
-        });
+            data: compagny,
+            status: 200
+        })
 
     } catch (error) {
 
-        return res.status(500).json({
+        return sendResponse(res, {
             success: false,
-            message: error.message
-        });
-
+            message: error.message,
+            status: 500
+        })
     }
 
 }
@@ -77,45 +81,47 @@ const updateCompagny = async (req, res) => {
         const compagny = await compagnyService.update(req.params.id, req.body)
 
         if (!compagny) {
-            return res.status(404).json({
+            return sendResponse(res, {
                 success: false,
-                message: "Compagnie introuvable"
+                message: "Compagnie introuvable",
+                status: 404
             })
         }
 
-        return res.status(200).json({
-            success: true,
-            message: "Compagnie mise à jour",
-            data: compagny
+        return sendResponse(res, {
+            message: 'Compagnie mise à jour',
+            data: compagny,
+            status: 200
         })
 
     } catch (error) {
-        return res.status(500).json({
+        return sendResponse(res, {
             success: false,
-            message: error.message
+            message: error.message,
+            status: 500
         })
     }
 }
-
 const deleteCompagny = async (req, res) => {
     try {
         const result = await compagnyService.delete(req.params.id)
 
         if (!result) {
-            return res.status(404).json({
+            return sendResponse(res, {
                 success: false,
-                message: "Compagnie introuvable"
+                message: "Compagnie introuvable",
+                status: 404
             })
         }
-        return res.status(200).json({
-            success: true,
-            message: "Compagnie supprimée"
-        });
-
+        return sendResponse(res, {
+            message: 'Compagnie supprimée',
+            status: 200
+        })
     } catch (error) {
-        return res.status(500).json({
+        return sendResponse(res, {
             success: false,
-            message: error.message
+            message: error.message,
+            status: 500
         })
     }
 }
