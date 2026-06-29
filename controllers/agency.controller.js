@@ -1,110 +1,151 @@
 const agencyService = require("../service/agency.service");
+const { sendResponse } = require("../utils/message");
 
 const createAgency = async (req, res) => {
     try {
+
+        let compagny_id = req.user.compagny_id;
+
+        if (req.user.role === "SUPER_ADMIN") {
+            compagny_id = req.body.compagny_id;
+        }
 
         const payload = {
             name: req.body.name,
             city: req.body.city,
             address: req.body.address,
             phone: req.body.phone,
-            compagny_id: req.user.compagny_id
+            compagny_id
         }
 
 
-        const agency = await agencyService.create(payload);
+        const agences = await agencyService.create(payload);
 
-        return res.status(201).json({
-            message: "Agence créée avec succès",
-            data: agency
-        });
+        return sendResponse(res, {
+            message: 'Agence créée avec succès',
+            data: agences,
+            status: 201
+        })
 
     } catch (error) {
-        return res.status(400).json({
-            message: error.message
-        });
+        return sendResponse(res, {
+            success: false,
+            message: error.message,
+            status: 500
+        })
     }
 };
-
 const listAgency = async (req, res) => {
     try {
-        const where = {};
 
-        // 🔒 filtrage automatique SaaS
+        const filters = {
+            search: req.query.search,
+            status: req.query.status
+        };
+
         if (req.user.role !== "SUPER_ADMIN") {
-            where.company_id = req.user.company_id;
+            filters.compagny_id = req.user.compagny_id;
+        } else {
+            filters.compagny_id = req.query.compagny_id;
         }
 
-        const agencies = await agencyService.list({ where });
+        // const agencies = await agencyService.list({ where });
 
-        // const result = await agencyService.Paginate(
-        //     req.query.page,
-        //     req.query.limit,
-        //     {
-        //         company_id: req.query.company_id,
-        //         search: req.query.search
-        //     }
-        // );
+        const agences = await agencyService.Paginate(
+            req.query.page,
+            req.query.limit,
+            filters
+        );
 
-        return res.status(200).json(agencies);
-
+        return sendResponse(res, {
+            message: "Liste des Agences",
+            data: agences.data,
+            pagination: agences.pagination,
+            status: 200
+        })
     } catch (error) {
-
-        return res.status(500).json({
-            error: error.message
-        });
+        return sendResponse(res, {
+            success: false,
+            message: error.message,
+            status: 500
+        })
     }
 };
-
 const updateAgency = async (req, res) => {
     try {
 
-        const agency = await agencyService.update(
-            req.params.id,
-            req.body
-        );
+        const agences = await agencyService.getById(req.params.id);
 
-        if (!agency) {
-            return res.status(404).json({
-                message: "Agence introuvable"
+        if (!agences) {
+            return sendResponse(res, {
+                success: false,
+                message: 'Agence introuvable',
+                status: 404
+            })
+        }
+
+        if (
+            req.user.role !== "SUPER_ADMIN" &&
+            agences.compagny_id !== req.user.compagny_id
+        ) {
+            return sendResponse(res, {
+                success: false,
+                message: "Accès refusé",
+                status: 403
             });
         }
 
-        return res.status(200).json({
-            message: "Agence mise à jour",
-            data: agency
-        });
+        const updated = await agencyService.update(req.params.id, req.body);
 
+        return sendResponse(res, {
+            message: 'Agence mise à jour',
+            data: updated,
+            status: 200
+        })
     } catch (error) {
-
-        return res.status(500).json({
-            error: error.message
-        });
+        return sendResponse(res, {
+            success: false,
+            message: error.message,
+            status: 500
+        })
     }
 };
-
 const deleteAgency = async (req, res) => {
     try {
+        const agences = await agencyService.getById(req.params.id);
 
-        const result = await agencyService.delete(
-            req.params.id
-        );
-
-        if (!result) {
-            return res.status(404).json({
-                message: "Agence introuvable"
+        if (!agences) {
+            return sendResponse(res, {
+                success: false,
+                message: 'Agence introuvable',
+                status: 404
             });
         }
 
-        return res.status(200).json({
-            message: "Agence supprimée"
-        });
+        if (
+            req.user.role !== "SUPER_ADMIN" &&
+            agency.company_id !== req.user.company_id
+        ) {
+            return sendResponse(res, {
+                success: false,
+                message: "Accès refusé",
+                status: 403
+            });
+        }
 
+        await agencyService.delete(req.params.id);
+
+        return sendResponse(res, {
+            success: false,
+            message: 'Agence supprimée',
+            status: 200
+        })
     } catch (error) {
-
-        return res.status(500).json({
-            error: error.message
-        });
+        return sendResponse(res, {
+            success: false,
+            message: error.message,
+            status: 500
+        })
     }
 };
 
