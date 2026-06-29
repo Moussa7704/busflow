@@ -102,7 +102,6 @@ const updateCompagny = async (req, res) => {
         })
     }
 }
-
 const deleteCompagny = async (req, res) => {
     try {
         const result = await compagnyService.delete(req.params.id)
