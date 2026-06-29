@@ -7,6 +7,7 @@ const compagnyController = require("../controllers/compagny.controller");
 // Companies
 router.post("/",authenticate,authorize("SUPER_ADMIN"),compagnyController.createCompagny)
 router.get("/", compagnyController.listCompagny);
+router.get("/:id", compagnyController.getCompagnyById);
 router.put("/:id",authenticate,authorize("SUPER_ADMIN"),compagnyController.updateCompagny);
 router.delete("/:id",authenticate,authorize("SUPER_ADMIN"),compagnyController.deleteCompagny);
 
