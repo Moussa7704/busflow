@@ -22,7 +22,7 @@ const createCompagny = async (req, res) => {
 const listCompagny = async (req, res) => {
     try {
 
-        const result = await compagnyService.Paginate(
+        const compagny = await compagnyService.Paginate(
             req.query.page || 1,
             req.query.limit || 10,
             {
@@ -33,8 +33,8 @@ const listCompagny = async (req, res) => {
 
         return sendResponse(res, {
             message: "Liste des compagnies",
-            data: result.data,
-            pagination: result.pagination,
+            data: compagny.data,
+            pagination: compagny.pagination,
             status: 200
         });
 
