@@ -119,7 +119,11 @@ const deleteCompagny = async (req, res) => {
             status: 200
         })
     } catch (error) {
-        return errorResponse(res, error.message, 500)
+        return sendResponse(res, {
+            success: false,
+            message: error.message,
+            status: 500
+        })
     }
 }
 
