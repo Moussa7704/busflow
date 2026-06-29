@@ -124,7 +124,7 @@ const deleteAgency = async (req, res) => {
 
         if (
             req.user.role !== "SUPER_ADMIN" &&
-            agency.company_id !== req.user.company_id
+            agences.compagny_id !== req.user.compagny_id
         ) {
             return sendResponse(res, {
                 success: false,
@@ -136,7 +136,7 @@ const deleteAgency = async (req, res) => {
         await agencyService.delete(req.params.id);
 
         return sendResponse(res, {
-            success: false,
+            success: true,
             message: 'Agence supprimée',
             status: 200
         })
