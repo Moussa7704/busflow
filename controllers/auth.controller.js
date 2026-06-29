@@ -9,6 +9,16 @@ const register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(req.body.password, 10)
 
+    let compagny_id = req.user.compagny_id;
+
+    // Seul le SUPER_ADMIN peut choisir la compagnie
+    if (req.user.Role.name === "SUPER_ADMIN") {
+        compagny_id = req.body.compagny_id;
+    } else {
+        // COMPANY_ADMIN utilise automatiquement sa compagnie
+        compagny_id = req.user.compagny_id;
+    }
+
     const payload = {
         compagny_id: req.body.compagny_id,
         agency_id: req.body.agency_id,
