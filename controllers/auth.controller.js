@@ -106,7 +106,12 @@ const verifyOtp = async (req, res) => {
 
         //  user.is_verified = true;
         // await user.save();
-        const data = { id: user.id }
+        const data = {
+            id: user.id,
+            role: user.Role?.name,
+            compagny_id: user.compagny_id,
+            agency_id: user.agency_id
+        };
         const accessToken = generateAccessToken(data)
         const refreshToken = generateRefreshToken(data)
 

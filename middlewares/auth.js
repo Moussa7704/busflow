@@ -28,7 +28,7 @@ const authenticate = async (req, res, next) => {
             id: user.id,
             compagny_id: user.compagny_id,
             agency_id: user.agency_id,
-            role: user.Role?.name
+            role: user.Role?.name || "UNKNOWN"
         }
 
         next()
