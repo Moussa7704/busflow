@@ -37,4 +37,18 @@ router.delete(
     agencyController.deleteAgency
 );
 
+router.get(
+    "/:id",
+    authenticate,
+    authorize(roles.SUPER_ADMIN, roles.COMPAGNY_ADMIN),
+    agencyController.getAgencyById
+);
+
+router.patch(
+    "/:id/status",
+    authenticate,
+    authorize(roles.SUPER_ADMIN, roles.COMPAGNY_ADMIN),
+    agencyController.changeAgencyStatus
+);
+
 module.exports = router;

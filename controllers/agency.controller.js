@@ -148,10 +148,99 @@ const deleteAgency = async (req, res) => {
         })
     }
 };
+const getAgencyById = async (req, res) => {
+    try {
 
+        const agency = await agencyService.getById(req.params.id, {
+            include: ["Compagny"]
+        });
+
+        if (!agency) {
+            return sendResponse(res, {
+                success: false,
+                message: "Agence introuvable",
+                status: 404
+            });
+        }
+
+        // SUPER_ADMIN : accès total
+        if (
+            req.user.role !== "SUPER_ADMIN" &&
+            agency.compagny_id !== req.user.compagny_id
+        ) {
+            return sendResponse(res, {
+                success: false,
+                message: "Accès refusé",
+                status: 403
+            });
+        }
+
+        return sendResponse(res, {
+            message: "Agence récupérée avec succès",
+            data: agency,
+            status: 200
+        });
+
+    } catch (error) {
+
+        return sendResponse(res, {
+            success: false,
+            message: error.message,
+            status: 500
+        });
+
+    }
+};
+const changeAgencyStatus = async (req, res) => {
+    try {
+
+        const agency = await agencyService.getById(req.params.id);
+
+        if (!agency) {
+            return sendResponse(res, {
+                success: false,
+                message: "Agence introuvable",
+                status: 404
+            });
+        }
+
+        // SUPER_ADMIN : accès total
+        if (
+            req.user.role !== "SUPER_ADMIN" &&
+            agency.compagny_id !== req.user.compagny_id
+        ) {
+            return sendResponse(res, {
+                success: false,
+                message: "Accès refusé",
+                status: 403
+            });
+        }
+
+        agency.status = !agency.status;
+
+        await agency.save();
+
+        return sendResponse(res, {
+            message: `Agence ${agency.status ? "activée" : "désactivée"} avec succès`,
+            data: agency,
+            status: 200
+        });
+
+    } catch (error) {
+
+        return sendResponse(res, {
+            success: false,
+            message: error.message,
+            status: 500
+        });
+
+    }
+};
 module.exports = {
     createAgency,
     listAgency,
     updateAgency,
-    deleteAgency
+    deleteAgency,
+    getAgencyById,
+    changeAgencyStatus
 };
