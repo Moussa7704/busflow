@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const roles = require('../constants/roles')
 
 const agencyController = require("../controllers/agency.controller");
 
@@ -11,28 +12,28 @@ const {
 router.post(
     '/',
     authenticate,
-    authorize('SUPER_ADMIN', 'COMPAGNY_ADMIN'),
+    authorize(roles.SUPER_ADMIN, roles.COMPAGNY_ADMIN),
     agencyController.createAgency
 );
 
 router.get(
     '/',
     authenticate,
-    authorize('SUPER_ADMIN', 'COMPAGNY_ADMIN'),
+    authorize(roles.SUPER_ADMIN, roles.COMPAGNY_ADMIN),
     agencyController.listAgency
 );
 
 router.put(
     '/:id',
     authenticate,
-    authorize('SUPER_ADMIN', 'COMPAGNY_ADMIN'),
+    authorize(roles.SUPER_ADMIN, roles.COMPAGNY_ADMIN),
     agencyController.updateAgency
 );
 
 router.delete(
     '/:id',
     authenticate,
-    authorize('SUPER_ADMIN', 'COMPAGNY_ADMIN'),
+    authorize(roles.SUPER_ADMIN, roles.COMPAGNY_ADMIN),
     agencyController.deleteAgency
 );
 

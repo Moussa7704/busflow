@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       User.belongsTo(models.Compagny, {
         foreignKey: "compagny_id",
-        as: "Compagnies"
+        as: "Compagny"
       })
       User.hasMany(models.Otp, {
         foreignKey: "user_id",
@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
       });
       User.belongsTo(models.Agency, {
         foreignKey: "agency_id",
-        as: "agency"
+        as: "Agency"
       });
     }
   }
