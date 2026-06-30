@@ -22,49 +22,6 @@ router.post('/reset-password', authController.resetPassword);
 
 /**
  * @swagger
- * /auth/register:
- *   post:
- *     summary: Créer un nouvel utilisateur
- *     tags: [Authentication]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - first_name
- *               - last_name
- *               - email
- *               - password
- *             properties:
- *               compagny_id:
- *                 type: integer
- *               agency_id:
- *                 type: integer
- *               role_id:
- *                 type: integer
- *               first_name:
- *                 type: string
- *               last_name:
- *                 type: string
- *               phone:
- *                 type: string
- *               email:
- *                 type: string
- *                 format: email
- *               password:
- *                 type: string
- *                 format: password
- *     responses:
- *       201:
- *         description: Utilisateur créé avec succès
- *       400:
- *         description: Utilisateur déjà existant
- */
-
-/**
- * @swagger
  * /auth/login:
  *   post:
  *     summary: Connexion utilisateur
