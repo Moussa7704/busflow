@@ -59,6 +59,39 @@ class UserService extends BaseService {
 
         return await super.create(payload);
     }
+
+    async update(id, data) {
+
+        const user = await this.model.findByPk(id);
+        if (!user) return null;
+
+        if (data.email) {
+            const existingUser = await this.model.findOne({
+                where: {
+                    email: data.email,
+                    id: { [Op.ne]: id }
+                }
+            });
+
+            if (existingUser) {
+                throw new Error("Email déjà utilisé");
+            }
+        }
+
+        if (data.password) {
+            data.password = await bcrypt.hash(data.password, 10);
+        }
+
+        if (data.agency_id) {
+            const agency = await Agency.findByPk(data.agency_id);
+
+            if (!agency || agency.compagny_id !== user.compagny_id) {
+                throw new Error("Agence invalide");
+            }
+        }
+
+        return await super.update(id, data);
+    }
     async Paginate(page, limit, filters = {}) {
 
         const where = {};
@@ -117,6 +150,7 @@ class UserService extends BaseService {
             order: [["createdAt", "DESC"]]
         });
     }
+
 }
 
 module.exports = new UserService();

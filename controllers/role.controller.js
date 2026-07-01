@@ -1,6 +1,7 @@
 const { Op } = require("sequelize");
 const { Role } = require("../models");
 const roles = require("../constants/roles");
+const { sendResponse } = require("../utils/message");
 
 const listRoles = async (req, res) => {
     try {
@@ -16,7 +17,7 @@ const listRoles = async (req, res) => {
             case roles.COMPAGNY_ADMIN:
                 where.name = {
                     [Op.in]: [
-                        roles.AGENCY_ADMIN,
+                        //roles.AGENCY_ADMIN,
                         roles.AGENT,
                         roles.CONTROLLER,
                         roles.DRIVER
@@ -27,7 +28,7 @@ const listRoles = async (req, res) => {
             case roles.AGENCY_ADMIN:
                 where.name = {
                     [Op.in]: [
-                        roles.AGENT,
+                        //roles.AGENT,
                         roles.CONTROLLER,
                         roles.DRIVER
                     ]

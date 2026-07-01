@@ -17,15 +17,4 @@ router.get(
     roleController.listRoles
 );
 
-// router.get(
-//     "/:id",
-//     authenticate,
-//     authorize(
-//         roles.SUPER_ADMIN,
-//         roles.COMPAGNY_ADMIN,
-//         roles.AGENCY_ADMIN
-//     ),
-//     roleController.getRoleById
-// );
-
 module.exports = router;
