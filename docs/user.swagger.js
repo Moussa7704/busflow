@@ -1,7 +1,7 @@
 /**
  * @swagger
  * tags:
- *   name: Users
+ *   name: Utilisateurs
  *   description: Gestion des utilisateurs
  */
 
@@ -10,7 +10,7 @@
  * /api/v1/users:
  *   post:
  *     summary: Créer un utilisateur
- *     tags: [Users]
+ *     tags: [Utilisateurs]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -65,7 +65,7 @@
  * /api/v1/users:
  *   get:
  *     summary: Liste des utilisateurs
- *     tags: [Users]
+ *     tags: [Utilisateurs]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -107,7 +107,7 @@
  * /api/v1/users/{id}:
  *   get:
  *     summary: Détail d'un utilisateur
- *     tags: [Users]
+ *     tags: [Utilisateurs]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -128,7 +128,7 @@
  * /api/v1/users/{id}:
  *   put:
  *     summary: Modifier un utilisateur
- *     tags: [Users]
+ *     tags: [Utilisateurs]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -155,7 +155,7 @@
  * /api/v1/users/{id}:
  *   delete:
  *     summary: Supprimer un utilisateur
- *     tags: [Users]
+ *     tags: [Utilisateurs]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -176,7 +176,7 @@
  * /api/v1/users/{id}/status:
  *   patch:
  *     summary: Activer ou désactiver un utilisateur
- *     tags: [Users]
+ *     tags: [Utilisateurs]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -196,7 +196,7 @@
  *   put:
  *     summary: Réinitialiser le mot de passe d'un utilisateur
  *     description: Accessible uniquement au SUPER_ADMIN et COMPAGNY_ADMIN.
- *     tags: [Users]
+ *     tags: [Utilisateurs]
  *     security:
  *       - bearerAuth: []
  *     parameters:

@@ -28,7 +28,7 @@ const userRoutes = require("./routes/user")
 app.use('/api/v1/auth', authRoutes)
 app.use('/api/v1/users', userRoutes)
 app.use('/api/v1/compagnies', compagnyRoutes)
-app.use('/api/v1/agency', agencyRoutes)
+app.use('/api/v1/agences', agencyRoutes)
 
 
 module.exports = app

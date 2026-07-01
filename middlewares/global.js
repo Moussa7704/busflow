@@ -2,7 +2,7 @@ const roles = require("../constants/roles");
 
 /**
  * SaaS GLOBAL CONTEXT MIDDLEWARE
- * - Inject company scope
+ * - Inject compagnies scope
  * - Protect multi-tenant access
  */
 const saasContext = (req, res, next) => {
@@ -30,11 +30,11 @@ const saasContext = (req, res, next) => {
         }
 
         // =========================
-        // 2. COMPANY ADMIN
+        // 2. COMPAGNY ADMIN
         // =========================
         else if (role === roles.COMPAGNY_ADMIN) {
             req.saas = {
-                scope: "COMPANY",
+                scope: "COMPAGNY",
                 compagny_id: user.compagny_id,
                 agency_id: null
             };

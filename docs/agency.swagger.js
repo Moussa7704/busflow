@@ -6,7 +6,7 @@
  */
 /**
  * @swagger
- * /api/v1/agences:
+ * /agences:
  *   post:
  *     summary: Créer une agence
  *     tags: [Agences]
@@ -47,7 +47,7 @@
 
 /**
  * @swagger
- * /api/v1/agences:
+ * /agences:
  *   get:
  *     summary: Liste des agences
  *     tags: [Agences]
@@ -81,7 +81,7 @@
 
 /**
  * @swagger
- * /api/v1/agences/{id}:
+ * /agences/{id}:
  *   put:
  *     summary: Modifier une agence
  *     tags: [Agences]
@@ -110,7 +110,7 @@
 
 /**
  * @swagger
- * /api/v1/agences/{id}:
+ * /agences/{id}:
  *   delete:
  *     summary: Supprimer une agence
  *     tags: [Agences]
@@ -133,7 +133,7 @@
 
 /**
  * @swagger
- * /api/v1/agences/{id}:
+ * /agences/{id}:
  *   get:
  *     summary: Détail d'une agence
  *     tags: [Agences]
@@ -154,7 +154,7 @@
 
 /**
  * @swagger
- * /api/v1/agences/{id}/status:
+ * /agences/{id}/status:
  *   patch:
  *     summary: Activer / désactiver une agence
  *     tags: [Agences]

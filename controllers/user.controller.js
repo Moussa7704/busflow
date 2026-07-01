@@ -332,7 +332,7 @@ const changePassword = async (req, res) => {
         // SUPER_ADMIN => accès total
         if (req.user.role !== roles.SUPER_ADMIN) {
 
-            // COMPANY ADMIN => même compagnie seulement
+            // COMPAGNY ADMIN => même compagnie seulement
             if (
                 req.user.role === roles.COMPAGNY_ADMIN &&
                 user.compagny_id !== req.user.compagny_id

@@ -18,7 +18,7 @@ module.exports = {
       throw new Error("Role SUPER_ADMIN introuvable");
     }
 
-    // 2. COMPANY
+    // 2. COMPAGNY
     const [companies] = await queryInterface.sequelize.query(
       `SELECT id FROM "Compagnies" LIMIT 1;`
     );
@@ -29,18 +29,18 @@ module.exports = {
 
       await queryInterface.bulkInsert('Compagnies', [
         {
-          name: 'Default Company',
+          name: 'Default Compagnies',
           status: "ACTIVE",
           createdAt: new Date(),
           updatedAt: new Date()
         }
       ]);
 
-      const [newCompany] = await queryInterface.sequelize.query(
+      const [newCompagnies] = await queryInterface.sequelize.query(
         `SELECT id FROM "Compagnies" ORDER BY id DESC LIMIT 1;`
       );
 
-      compagnyId = newCompany?.[0]?.id;
+      compagnyId = newCompagnies?.[0]?.id;
     }
 
     // 3. CHECK USER EXIST
