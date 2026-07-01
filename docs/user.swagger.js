@@ -7,7 +7,7 @@
 
 /**
  * @swagger
- * /api/v1/users:
+ * /users:
  *   post:
  *     summary: Créer un utilisateur
  *     tags: [Utilisateurs]
@@ -62,7 +62,7 @@
 
 /**
  * @swagger
- * /api/v1/users:
+ * /users:
  *   get:
  *     summary: Liste des utilisateurs
  *     tags: [Utilisateurs]
@@ -104,7 +104,7 @@
 
 /**
  * @swagger
- * /api/v1/users/{id}:
+ * /users/{id}:
  *   get:
  *     summary: Détail d'un utilisateur
  *     tags: [Utilisateurs]
@@ -125,7 +125,7 @@
 
 /**
  * @swagger
- * /api/v1/users/{id}:
+ * /users/{id}:
  *   put:
  *     summary: Modifier un utilisateur
  *     tags: [Utilisateurs]
@@ -152,7 +152,7 @@
 
 /**
  * @swagger
- * /api/v1/users/{id}:
+ * /users/{id}:
  *   delete:
  *     summary: Supprimer un utilisateur
  *     tags: [Utilisateurs]
@@ -173,7 +173,7 @@
 
 /**
  * @swagger
- * /api/v1/users/{id}/status:
+ * /users/{id}/status:
  *   patch:
  *     summary: Activer ou désactiver un utilisateur
  *     tags: [Utilisateurs]
@@ -192,7 +192,7 @@
 
 /**
  * @swagger
- * /api/v1/users/{id}/change-password:
+ * /{id}/change-password:
  *   put:
  *     summary: Réinitialiser le mot de passe d'un utilisateur
  *     description: Accessible uniquement au SUPER_ADMIN et COMPAGNY_ADMIN.
