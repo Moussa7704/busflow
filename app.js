@@ -23,11 +23,13 @@ const authRoutes = require("./routes/auth")
 const compagnyRoutes = require("./routes/compagny")
 const agencyRoutes = require("./routes/agency")
 const userRoutes = require("./routes/user")
+const roleRoutes = require("./routes/roles")
 
 
 app.use('/api/v1/auth', authRoutes)
 app.use('/api/v1/users', userRoutes)
 app.use('/api/v1/compagnies', compagnyRoutes)
+app.use('/api/v1/roles', roleRoutes)
 app.use('/api/v1/agences', agencyRoutes)
 
 

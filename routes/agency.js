@@ -19,7 +19,7 @@ router.post(
 router.get(
     '/',
     authenticate,
-    authorize(roles.SUPER_ADMIN, roles.COMPAGNY_ADMIN),
+    authorize(roles.SUPER_ADMIN, roles.COMPAGNY_ADMIN, roles.AGENCY_ADMIN),
     agencyController.listAgency
 );
 
