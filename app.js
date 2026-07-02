@@ -32,7 +32,7 @@ app.use('/api/v1/users', userRoutes)
 app.use('/api/v1/compagnies', compagnyRoutes)
 app.use('/api/v1/roles', roleRoutes)
 app.use('/api/v1/agences', agencyRoutes)
-app.use('/api/v1/bus', busRoutes)
+app.use('/api/v1/buses', busRoutes)
 
 
 module.exports = app

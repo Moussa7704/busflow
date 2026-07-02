@@ -2,13 +2,18 @@ const { Bus } = require('../models');
 const { Compagny } = require('../models');
 const BaseService = require('./base-service');
 const { Op } = require("sequelize")
+const roles = require('../constants/roles')
 
 
 class BusService extends BaseService {
     constructor() {
         super(Bus)
     }
-    async create(data) {
+    async create(data, currentUser) {
+
+        if (currentUser.role === roles.AGENCY_ADMIN) {
+            throw new Error("Accès refusé. Création de bus non autorisée.");
+        }
 
         const ExistBus = await this.model.findOne({
             where: { plate_number: data.plate_number }
@@ -72,6 +77,11 @@ class BusService extends BaseService {
 
         if (!bus) {
             return null;
+        }
+
+
+        if (currentUser.role === roles.AGENCY_ADMIN) {
+            throw new Error("Accès refusé.");
         }
 
         // Vérification SaaS
@@ -149,6 +159,10 @@ class BusService extends BaseService {
 
         if (!bus) {
             return null;
+        }
+
+        if (currentUser.role === roles.AGENCY_ADMIN) {
+            throw new Error("Accès refusé.");
         }
 
         // Vérification SaaS
@@ -239,6 +253,11 @@ class BusService extends BaseService {
             return null;
         }
 
+        // SUPER_ADMIN ok
+        if (currentUser.role === roles.SUPER_ADMIN) {
+            return bus;
+        }
+
         // SaaS
         if (
             currentUser.role !== roles.SUPER_ADMIN &&
@@ -256,6 +275,17 @@ class BusService extends BaseService {
 
         if (!bus) {
             return null;
+        }
+
+        if (currentUser.role === roles.AGENCY_ADMIN) {
+            throw new Error("Accès refusé.");
+        }
+
+        if (
+            currentUser.role !== roles.SUPER_ADMIN &&
+            bus.compagny_id !== currentUser.compagny_id
+        ) {
+            throw new Error("Accès refusé.");
         }
 
         if (!Object.values(busStatus).includes(status)) {

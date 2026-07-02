@@ -14,8 +14,7 @@ router.post(
     authenticate,
     authorize(
         roles.SUPER_ADMIN,
-        roles.COMPAGNY_ADMIN,
-        roles.AGENCY_ADMIN
+        roles.COMPAGNY_ADMIN
     ),
     busController.createBus
 );
@@ -47,8 +46,7 @@ router.put(
     authenticate,
     authorize(
         roles.SUPER_ADMIN,
-        roles.COMPAGNY_ADMIN,
-        roles.AGENCY_ADMIN
+        roles.COMPAGNY_ADMIN
     ),
     busController.updateBus
 );
@@ -58,8 +56,7 @@ router.delete(
     authenticate,
     authorize(
         roles.SUPER_ADMIN,
-        roles.COMPAGNY_ADMIN,
-        roles.AGENCY_ADMIN
+        roles.COMPAGNY_ADMIN
     ),
     busController.deleteBus
 );
