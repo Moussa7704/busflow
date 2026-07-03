@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       TripRoute.belongsTo(models.Compagny, {
         foreignKey: "compagny_id",
-        as: "Compagnies"
+        as: "Compagny"
       })
       TripRoute.hasMany(models.Trip, {
         foreignKey: "route_id",
