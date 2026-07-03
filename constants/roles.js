@@ -4,7 +4,6 @@ module.exports = {
     AGENCY_ADMIN: "AGENCY_ADMIN",
     AGENT: "AGENT",
     CAISSIER: "CAISSIER",
-    CHAUFFEUR: "CHAUFFEUR",
     CONTROLLER: "CONTROLLER",
     DRIVER: "DRIVER"
 };

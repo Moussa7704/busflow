@@ -1,9 +1,16 @@
 /**
  * @swagger
+ * tags:
+ *   name: Routes voyage
+ *   description: Gestion des routes de voyage
+ */
+
+/**
+ * @swagger
  * /trip-routes:
  *   post:
  *     summary: Créer une route de voyage
- *     tags: [Trip Routes]
+ *     tags: [Routes voyage]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -48,7 +55,7 @@
  * /trip-routes:
  *   get:
  *     summary: Liste des routes
- *     tags: [Trip Routes]
+ *     tags: [Routes voyage]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -85,7 +92,7 @@
  * /trip-routes/{id}:
  *   get:
  *     summary: Récupérer une route par son ID
- *     tags: [Trip Routes]
+ *     tags: [Routes voyage]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -109,7 +116,7 @@
  * /trip-routes/{id}:
  *   put:
  *     summary: Modifier une route
- *     tags: [Trip Routes]
+ *     tags: [Routes voyage]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -152,7 +159,7 @@
  * /trip-routes/{id}:
  *   delete:
  *     summary: Supprimer une route
- *     tags: [Trip Routes]
+ *     tags: [Routes voyage]
  *     security:
  *       - bearerAuth: []
  *     parameters:

@@ -18,11 +18,17 @@ module.exports = {
       bus_id: {
         type: Sequelize.INTEGER
       },
+      driver_id: {
+        type: Sequelize.INTEGER
+      },
       departure_time: {
         type: Sequelize.DATE
       },
       arrival_time: {
         type: Sequelize.DATE
+      },
+      available_seats: {
+        type: Sequelize.INTEGER
       },
       price: {
         type: Sequelize.DECIMAL
