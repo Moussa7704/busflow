@@ -28,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
       });
       User.hasMany(models.Trip, {
         foreignKey: "driver_id",
-        as: "Trips"
+        as: "DriverTrips"
       });
     }
   }
