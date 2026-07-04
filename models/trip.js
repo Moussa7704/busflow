@@ -24,7 +24,11 @@ module.exports = (sequelize, DataTypes) => {
       })
       Trip.hasMany(models.Booking, {
         foreignKey: "trip_id",
-        as: "bookings"
+        as: "booking"
+      });
+      Trip.belongsTo(models.User, {
+        foreignKey: "driver_id",
+        as: "Driver"
       });
     }
   }
@@ -34,6 +38,7 @@ module.exports = (sequelize, DataTypes) => {
     bus_id: DataTypes.INTEGER,
     departure_time: DataTypes.DATE,
     arrival_time: DataTypes.DATE,
+    available_seats: DataTypes.INTEGER,
     price: DataTypes.DECIMAL,
     status: DataTypes.STRING
   }, {

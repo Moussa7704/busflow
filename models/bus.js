@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
 
       Bus.belongsTo(models.Compagny, {
         foreignKey: "compagny_id",
-        as: "compagny"
+        as: "Compagny"
       });
 
       Bus.hasMany(models.Trip, {

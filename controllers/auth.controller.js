@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { sendOtpEmail } = require('../utils/sendEmail');
 const { generateAccessToken, generateRefreshToken, verifyRefreshToken } = require("../utils/jwt");
+const { sendResponse } = require("../utils/message");
 
 const login = async (req, res) => {
     const payload = {
@@ -159,16 +160,19 @@ const me = async (req, res) => {
                 message: "Utilisateur non authentifié"
             });
         }
-        const { password, ...safeUser } = user.toJSON();
-        return res.status(200).json({
+        return sendResponse(res, {
             message: "Utilisateur connecté",
-            data: safeUser
+            data: req.user,
+            status: 200
         });
 
     } catch (err) {
-        return res.status(500).json({
-            error: err.message
+        return sendResponse(res, {
+            success: false,
+            message: error.message,
+            status: 500
         });
+
     }
 };
 const forgetPassword = async (req, res) => {

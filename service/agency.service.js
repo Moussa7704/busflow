@@ -25,8 +25,8 @@ class AgencyService extends BaseService {
 
         const where = {};
 
-        if (filters.company_id) {
-            where.company_id = filters.company_id;
+        if (filters.compagny_id) {
+            where.compagny_id = filters.compagny_id;
         }
 
         if (filters.search) {
@@ -40,7 +40,7 @@ class AgencyService extends BaseService {
             limit,
             {
                 where,
-                order: [['createdAt', 'DESC']]
+                order: [["id", "ASC"]]
             }
         );
     }
