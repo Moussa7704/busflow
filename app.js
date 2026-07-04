@@ -34,7 +34,7 @@ app.use('/api/v1/compagnies', compagnyRoutes)
 app.use('/api/v1/roles', roleRoutes)
 app.use('/api/v1/agences', agencyRoutes)
 app.use('/api/v1/buses', busRoutes)
-app.use('/api/v1/trip-routes', tripRoutes)
+app.use('/api/v1/trips', tripRoutes)
 
 
 
