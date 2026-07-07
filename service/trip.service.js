@@ -193,7 +193,7 @@ class TripService extends BaseService {
         // CREATE
         // ===========================
 
-         const payload = {
+        const payload = {
 
             compagny_id,
 
@@ -218,7 +218,6 @@ class TripService extends BaseService {
         return await super.create(payload);
 
     }
-
     async getById(id, currentUser) {
         const trip = await this.model.findByPk(id, {
             include: [
@@ -243,7 +242,6 @@ class TripService extends BaseService {
         return trip;
 
     }
-
     async update(id, data, currentUser) {
 
         const trip = await this.getById(id, currentUser);
@@ -395,7 +393,6 @@ class TripService extends BaseService {
         return await super.update(id, payload);
 
     }
-
     async delete(id, currentUser) {
 
         const trip = await this.getById(id, currentUser);
@@ -574,6 +571,105 @@ class TripService extends BaseService {
                 ["departure_time", "ASC"]
             ]
         });
+
+    }
+    async getPassengers(tripId, currentUser) {
+
+        const trip = await Trip.findByPk(tripId, {
+
+            include: [
+                {
+                    association: "bus"
+                },
+                {
+                    association: "TripRoute"
+                }
+            ]
+
+        });
+
+
+        if (!trip) {
+            throw new Error("Voyage introuvable.");
+        }
+
+
+        // Contrôle SaaS
+
+        if (
+            currentUser.role !== roles.SUPER_ADMIN &&
+            trip.compagny_id !== currentUser.compagny_id
+        ) {
+            throw new Error("Accès refusé.");
+        }
+
+
+        const bookings = await Booking.findAll({
+
+            where: {
+
+                trip_id: tripId,
+
+                status: bookingStatus.CONFIRMED
+
+            },
+
+            include: [
+
+                {
+                    association: "passenger",
+                    attributes: [
+                        "id",
+                        "first_name",
+                        "last_name",
+                        "phone",
+                        "email"
+                    ]
+                }
+
+            ],
+
+            order: [
+                ["seat_number", "ASC"]
+            ]
+
+        });
+
+
+        return {
+
+            trip: {
+
+                id: trip.id,
+
+                departure_time: trip.departure_time,
+
+                arrival_time: trip.arrival_time,
+
+                bus: trip.bus,
+
+                route: trip.TripRoute
+
+            },
+
+            total_passengers: bookings.length,
+
+            passengers: bookings.map(item => ({
+
+                booking_id: item.id,
+
+                seat_number: item.seat_number,
+
+                booking_reference:
+                    item.booking_reference,
+
+                passenger:
+                    item.passenger
+
+            }))
+
+        };
+
 
     }
 }

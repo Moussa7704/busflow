@@ -89,4 +89,16 @@ router.patch(
     tripController.cancelTrip
 );
 
+// Liste des passagers d'un voyage
+router.get(
+    "/:id/passengers",
+    authenticate,
+    authorize(
+        roles.SUPER_ADMIN,
+        roles.COMPAGNY_ADMIN,
+        roles.AGENCY_ADMIN,
+        roles.CONTROLLER
+    ),
+    tripController.getTripPassengers
+);
 module.exports = router;
