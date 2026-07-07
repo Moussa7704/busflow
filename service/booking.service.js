@@ -11,141 +11,37 @@ class BookingService extends BaseService {
     constructor() {
         super(Booking);
     }
-    async create(data, currentUser) {
+    async createFromBooking(booking_id) {
 
-        const transaction = await sequelize.transaction();
+        const booking = await Booking.findByPk(booking_id, {
+            include: [
+                "passenger",
+                "trip"
+            ]
+        }
+        );
 
-        try {
-
-            let compagny_id;
-
-            if (currentUser.role === roles.SUPER_ADMIN) {
-
-                if (!data.compagny_id) {
-                    throw new Error("La compagnie est obligatoire.");
-                }
-
-                compagny_id = data.compagny_id;
-
-            } else {
-
-                compagny_id = currentUser.compagny_id;
-
-            }
-
-            const trip = await Trip.findByPk(data.trip_id, {
-                transaction
-            });
-
-            if (!trip) {
-                throw new Error("Voyage introuvable.");
-            }
-
-            if (trip.compagny_id !== compagny_id) {
-                throw new Error("Voyage invalide.");
-            }
-
-            if (
-                trip.status === tripStatus.CANCELLED ||
-                trip.status === tripStatus.ARRIVED
-            ) {
-                throw new Error("Impossible de réserver ce voyage.");
-            }
-
-            if (new Date(trip.departure_time) <= new Date()) {
-                throw new Error("Le voyage est déjà parti.");
-            }
-
-            if (trip.available_seats <= 0) {
-                throw new Error("Plus aucune place disponible.");
-            }
-
-
-            const passenger = await Passenger.findByPk(
-                data.passenger_id,
-                {
-                    transaction
-                }
+        if (!booking) {
+            throw new Error(
+                "Réservation introuvable"
             );
-
-            if (!passenger) {
-                throw new Error("Passager introuvable.");
-            }
-
-            if (passenger.compagny_id !== compagny_id) {
-                throw new Error("Passager invalide.");
-            }
-
-            const seatExist = await Booking.findOne({
-
-                where: {
-                    trip_id: trip.id,
-                    seat_number: data.seat_number,
-                    status: {
-                        [Op.ne]: bookingStatus.CANCELLED
-                    }
-                },
-
-                transaction
-
-            });
-
-            if (seatExist) {
-                throw new Error("Ce siège est déjà réservé.");
-            }
-
-            const booking_reference =
-                "BK" +
-                Date.now() +
-                Math.floor(Math.random() * 1000);
-
-
-            const booking = await Booking.create({
-
-                compagny_id,
-
-                trip_id: data.trip_id,
-
-                passenger_id: data.passenger_id,
-
-                seat_number: data.seat_number,
-
-                booking_reference,
-
-                created_by: currentUser.id,
-
-                status:
-                    data.status ||
-                    bookingStatus.PENDING
-
-            }, {
-                transaction
-            });
-
-            await trip.update({
-
-                available_seats:
-                    trip.available_seats - 1
-
-            }, {
-                transaction
-            });
-
-            await transaction.commit();
-
-            return await this.getById(
-                booking.id,
-                currentUser
-            );
-
-        } catch (error) {
-
-            await transaction.rollback();
-
-            throw error;
-
         }
 
+        const ticket_number = "TK-" + Date.now();
+        const qrData = { token: ticket_number };
+
+        const qr_code = await QRCode.toDataURL(
+            JSON.stringify(qrData)
+        );
+
+        return await super.create({
+            booking_id,
+            compagny_id:
+                booking.compagny_id,
+            ticket_number,
+            qr_code,
+            status: "ACTIVE"
+        });
     }
     async update(id, data, currentUser) {
 
@@ -239,18 +135,25 @@ class BookingService extends BaseService {
         const booking = await this.getById(id, currentUser);
 
         if (!booking) {
-            throw new Error("Réservation introuvable.");
+            throw new Error(
+                "Réservation introuvable"
+            );
         }
-
-        if (booking.status !== bookingStatus.PENDING) {
-            throw new Error("Cette réservation est déjà confirmée.");
+        if (booking.status === "CONFIRMED") {
+            throw new Error(
+                "Réservation déjà confirmée"
+            );
         }
-
-        return await super.update(id, {
-
-            status: bookingStatus.CONFIRMED
-
+        await booking.update({
+            status: "CONFIRMED"
         });
+        // Création automatique du ticket
+        const ticket = await ticketService.createFromBooking(booking.id);
+
+        return {
+            booking,
+            ticket
+        };
 
     }
     async cancelBooking(id, currentUser) {
