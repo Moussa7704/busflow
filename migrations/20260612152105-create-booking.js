@@ -25,6 +25,9 @@ module.exports = {
         type: Sequelize.STRING,
         unique: true
       },
+      created_by: {
+        type: Sequelize.INTEGER
+      },
       status: {
         type: Sequelize.ENUM(
           "PENDING",

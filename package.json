@@ -12,7 +12,8 @@
     "create": "sequelize db:create",
     "migrate": "sequelize db:migrate",
     "undo-all": "sequelize db:migrate:undo:all",
-    "seed": "sequelize db:seed:all"
+    "seed": "sequelize db:seed:all",
+    "fresh": "npm run undo-all && npm run migrate && npm run seed && npm run start"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

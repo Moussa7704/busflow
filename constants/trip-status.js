@@ -1,7 +1,0 @@
-module.exports = {
-    SCHEDULED: "SCHEDULED",
-    BOARDING: "BOARDING",
-    DEPARTED: "DEPARTED",
-    ARRIVED: "ARRIVED",
-    CANCELLED: "CANCELLED"
-};
