@@ -246,3 +246,158 @@
  *       400:
  *         description: Impossible d’annuler
  */
+
+/**
+ * @swagger
+ * /trips/{id}/passengers:
+ *   get:
+ *     summary: Liste des passagers confirmés d'un voyage
+ *     description: |
+ *       Retourne la liste des passagers ayant une réservation confirmée pour un voyage donné.
+ *       Utilisé pour la feuille d'embarquement, le contrôle chauffeur et l'impression de la liste voyageurs.
+ *     tags:
+ *       - Voyages
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Identifiant du voyage
+ *         schema:
+ *           type: integer
+ *         example: 25
+ *
+ *     responses:
+ *
+ *       200:
+ *         description: Liste des passagers récupérée avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *
+ *                 message:
+ *                   type: string
+ *                   example: Liste des passagers du voyage
+ *
+ *                 data:
+ *                   type: object
+ *
+ *                   properties:
+ *
+ *                     trip:
+ *                       type: object
+ *                       properties:
+ *
+ *                         id:
+ *                           type: integer
+ *                           example: 25
+ *
+ *                         departure_time:
+ *                           type: string
+ *                           format: date-time
+ *                           example: "2026-07-08T08:00:00Z"
+ *
+ *                         arrival_time:
+ *                           type: string
+ *                           format: date-time
+ *                           example: "2026-07-08T15:00:00Z"
+ *
+ *                         bus:
+ *                           type: object
+ *                           properties:
+ *
+ *                             id:
+ *                               type: integer
+ *                               example: 10
+ *
+ *                             plate_number:
+ *                               type: string
+ *                               example: "AB-1234-MD"
+ *
+ *                             bus_number:
+ *                               type: string
+ *                               example: "BUS-01"
+ *
+ *                         route:
+ *                           type: object
+ *                           properties:
+ *
+ *                             departure_city:
+ *                               type: string
+ *                               example: Bamako
+ *
+ *                             arrival_city:
+ *                               type: string
+ *                               example: Sikasso
+ *
+ *
+ *                     total_passengers:
+ *                       type: integer
+ *                       example: 45
+ *
+ *
+ *                     passengers:
+ *                       type: array
+ *
+ *                       items:
+ *                         type: object
+ *
+ *                         properties:
+ *
+ *                           booking_id:
+ *                             type: integer
+ *                             example: 100
+ *
+ *                           seat_number:
+ *                             type: string
+ *                             example: A12
+ *
+ *                           booking_reference:
+ *                             type: string
+ *                             example: BK202607080001
+ *
+ *                           passenger:
+ *                             type: object
+ *
+ *                             properties:
+ *
+ *                               id:
+ *                                 type: integer
+ *                                 example: 15
+ *
+ *                               first_name:
+ *                                 type: string
+ *                                 example: Moussa
+ *
+ *                               last_name:
+ *                                 type: string
+ *                                 example: Coulibaly
+ *
+ *                               phone:
+ *                                 type: string
+ *                                 example: "77000000"
+ *
+ *                               email:
+ *                                 type: string
+ *                                 example: moussa@email.com
+ *
+ *
+ *       401:
+ *         description: Token manquant ou invalide
+ *
+ *       403:
+ *         description: Accès refusé
+ *
+ *       404:
+ *         description: Voyage introuvable
+ *
+ *       500:
+ *         description: Erreur serveur
+ */
