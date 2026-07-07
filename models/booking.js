@@ -23,6 +23,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "booking_id",
         as: "ticket"
       });
+      Booking.belongsTo(models.User, {
+        foreignKey: "created_by",
+        as: "createdBy"
+      });
     }
   }
   Booking.init({

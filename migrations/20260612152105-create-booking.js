@@ -15,7 +15,7 @@ module.exports = {
       passenger_id: {
         type: Sequelize.INTEGER
       },
-       compagny_id: {
+      compagny_id: {
         type: Sequelize.INTEGER
       },
       seat_number: {
@@ -26,7 +26,14 @@ module.exports = {
         unique: true
       },
       created_by: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: "Users",
+          key: "id"
+        },
+        onUpdate: "CASCADE",
+        onDelete: "SET NULL"
       },
       status: {
         type: Sequelize.ENUM(
