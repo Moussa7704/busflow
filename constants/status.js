@@ -13,7 +13,14 @@ const bookingStatus = {
     COMPLETED: "COMPLETED"
 }
 
+const ticketStatus = {
+    ACTIVE: "ACTIVE",
+    USED: "USED",
+    CANCELLED: "CANCELLED"
+}
+
 module.exports = {
     tripStatus,
-    bookingStatus
+    bookingStatus,
+    ticketStatus
 }
