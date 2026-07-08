@@ -3,6 +3,7 @@ const BaseService = require("./base-service");
 const bookingStatus = require("../constants/status");
 const roles = require("../constants/roles");
 const tripStatus = require("../constants/status");
+const QRCode = require("qrcode");
 
 const { Op } = require("sequelize");
 
