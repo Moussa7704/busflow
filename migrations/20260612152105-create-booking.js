@@ -43,6 +43,33 @@ module.exports = {
         ),
         defaultValue: "CONFIRMED"
       },
+      booking_channel: {
+        type: Sequelize.ENUM(
+          "ONLINE",
+          "GUICHE"
+        ),
+        defaultValue: "GUICHE"
+      },
+      payment_status: {
+        type: Sequelize.ENUM(
+          "PENDING",
+          "CONFIRMED",
+          "CANCELLED"
+        ),
+        defaultValue: "PENDING"
+      },
+      payment_method: {
+        type: Sequelize.ENUM(
+          "CASH",
+          "CARD",
+          "MOBILE_MONEY"
+        ),
+        defaultValue: "CASH"
+      },
+      paid_amount: {
+        type: Sequelize.DECIMAL,
+        defaultValue: 0.00
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
