@@ -41,20 +41,21 @@ module.exports = {
           "CONFIRMED",
           "CANCELLED"
         ),
-        defaultValue: "CONFIRMED"
+        defaultValue: "PENDING"
       },
       booking_channel: {
         type: Sequelize.ENUM(
           "ONLINE",
-          "GUICHE"
+          "OFFICE"
         ),
-        defaultValue: "GUICHE"
+        defaultValue: "OFFICE"
       },
       payment_status: {
         type: Sequelize.ENUM(
           "PENDING",
-          "CONFIRMED",
-          "CANCELLED"
+          "PAID",
+          "FAILED",
+          "REFUNDED"
         ),
         defaultValue: "PENDING"
       },
