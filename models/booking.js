@@ -33,12 +33,11 @@ module.exports = (sequelize, DataTypes) => {
     trip_id: DataTypes.INTEGER,
     compagny_id: DataTypes.INTEGER,
     passenger_id: DataTypes.INTEGER,
-    seat_number: DataTypes.STRING,
     booking_reference: DataTypes.STRING,
     status: DataTypes.STRING,
     created_by: DataTypes.INTEGER,
-    booking_channel: DataTypes.STRING,
-    payment_status: DataTypes.STRING,
+    //booking_channel: DataTypes.STRING,
+    //payment_status: DataTypes.STRING,
     payment_method: DataTypes.STRING,
     paid_amount: DataTypes.DECIMAL
   }, {

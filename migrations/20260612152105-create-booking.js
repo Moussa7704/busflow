@@ -18,9 +18,6 @@ module.exports = {
       compagny_id: {
         type: Sequelize.INTEGER
       },
-      seat_number: {
-        type: Sequelize.STRING
-      },
       booking_reference: {
         type: Sequelize.STRING,
         unique: true
@@ -43,27 +40,26 @@ module.exports = {
         ),
         defaultValue: "PENDING"
       },
-      booking_channel: {
-        type: Sequelize.ENUM(
-          "ONLINE",
-          "OFFICE"
-        ),
-        defaultValue: "OFFICE"
-      },
-      payment_status: {
-        type: Sequelize.ENUM(
-          "PENDING",
-          "PAID",
-          "FAILED",
-          "REFUNDED"
-        ),
-        defaultValue: "PENDING"
-      },
+      // booking_channel: {
+      //   type: Sequelize.ENUM(
+      //     "ONLINE",
+      //     "OFFICE"
+      //   ),
+      //   defaultValue: "OFFICE"
+      // },
+      // payment_status: {
+      //   type: Sequelize.ENUM(
+      //     "PENDING",
+      //     "PAID",
+      //     "FAILED",
+      //     "REFUNDED"
+      //   ),
+      //   defaultValue: "PENDING"
+      // },
       payment_method: {
         type: Sequelize.ENUM(
           "CASH",
-          "CARD",
-          "MOBILE_MONEY"
+          "Orange Money"
         ),
         defaultValue: "CASH"
       },
