@@ -126,31 +126,6 @@ const updateBooking = async (req, res) => {
     }
 };
 
-const confirmBooking = async (req, res) => {
-    try {
-
-        const booking = await bookingService.confirmBooking(
-            req.params.id,
-            req.user
-        );
-
-        return sendResponse(res, {
-            message: "Réservation confirmée",
-            data: booking,
-            status: 200
-        });
-
-    } catch (error) {
-
-        return sendResponse(res, {
-            success: false,
-            message: error.message,
-            status: 400
-        });
-
-    }
-};
-
 const cancelBooking = async (req, res) => {
     try {
 
@@ -205,7 +180,6 @@ module.exports = {
     listBookings,
     getBookingById,
     updateBooking,
-    confirmBooking,
     cancelBooking,
     deleteBooking
 };
