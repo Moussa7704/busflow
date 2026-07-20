@@ -157,27 +157,6 @@
 
 /**
  * @swagger
- * /bookings/{id}/confirm:
- *   patch:
- *     summary: Confirmer une réservation
- *     tags: [Réservations]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Réservation confirmée
- *       400:
- *         description: Impossible de confirmer
- */
-
-/**
- * @swagger
  * /bookings/{id}/cancel:
  *   patch:
  *     summary: Annuler une réservation
