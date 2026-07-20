@@ -26,6 +26,7 @@ const userRoutes = require("./routes/user")
 const roleRoutes = require("./routes/roles")
 const busRoutes = require("./routes/bus")
 const tripRoutes = require("./routes/tripRoute")
+const bookingRoutes = require("./routes/booking")
 
 
 app.use('/api/v1/auth', authRoutes)
@@ -35,6 +36,7 @@ app.use('/api/v1/roles', roleRoutes)
 app.use('/api/v1/agences', agencyRoutes)
 app.use('/api/v1/buses', busRoutes)
 app.use('/api/v1/trip-routes', tripRoutes)
+app.use('/api/v1/bookings', bookingRoutes)
 
 
 

@@ -195,6 +195,45 @@ const cancelTrip = async (req, res) => {
     }
 };
 
+const getTripPassengers = async(req,res)=>{
+
+    try {
+
+        const data =
+            await tripService.getPassengers(
+                req.params.id,
+                req.user
+            );
+
+
+        return sendResponse(res,{
+
+            message:
+            "Liste des passagers du voyage",
+
+            data,
+
+            status:200
+
+        });
+
+
+    } catch(error){
+
+        return sendResponse(res,{
+
+            success:false,
+
+            message:error.message,
+
+            status:400
+
+        });
+
+    }
+
+};
+
 
 module.exports = {
     createTrip,
@@ -203,5 +242,6 @@ module.exports = {
     updateTrip,
     deleteTrip,
     changeTripStatus,
-    cancelTrip
+    cancelTrip,
+    getTripPassengers
 }

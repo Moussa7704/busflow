@@ -15,15 +15,22 @@ module.exports = {
       passenger_id: {
         type: Sequelize.INTEGER
       },
-       compagny_id: {
+      compagny_id: {
         type: Sequelize.INTEGER
-      },
-      seat_number: {
-        type: Sequelize.STRING
       },
       booking_reference: {
         type: Sequelize.STRING,
         unique: true
+      },
+      created_by: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: "Users",
+          key: "id"
+        },
+        onUpdate: "CASCADE",
+        onDelete: "SET NULL"
       },
       status: {
         type: Sequelize.ENUM(
@@ -31,7 +38,34 @@ module.exports = {
           "CONFIRMED",
           "CANCELLED"
         ),
-        defaultValue: "CONFIRMED"
+        defaultValue: "PENDING"
+      },
+      // booking_channel: {
+      //   type: Sequelize.ENUM(
+      //     "ONLINE",
+      //     "OFFICE"
+      //   ),
+      //   defaultValue: "OFFICE"
+      // },
+      // payment_status: {
+      //   type: Sequelize.ENUM(
+      //     "PENDING",
+      //     "PAID",
+      //     "FAILED",
+      //     "REFUNDED"
+      //   ),
+      //   defaultValue: "PENDING"
+      // },
+      payment_method: {
+        type: Sequelize.ENUM(
+          "CASH",
+          "Orange Money"
+        ),
+        defaultValue: "CASH"
+      },
+      paid_amount: {
+        type: Sequelize.DECIMAL,
+        defaultValue: 0.00
       },
       createdAt: {
         allowNull: false,
