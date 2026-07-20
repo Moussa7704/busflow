@@ -5,7 +5,7 @@ const roles = require("../constants/roles");
 const createBooking = async (req, res) => {
     try {
 
-        const booking = await bookingService.createFromBooking(req.body, req.user);
+        const booking = await bookingService.create(req.body, req.user);
 
         return sendResponse(res, {
             message: "Réservation créée avec succès",

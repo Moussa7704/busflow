@@ -12,37 +12,53 @@ class BookingService extends BaseService {
     constructor() {
         super(Booking);
     }
-    async createFromBooking(booking_id) {
+    async create(data, currentUser) {
 
-        const booking = await Booking.findByPk(booking_id, {
-            include: [
-                "passenger",
-                "trip"
-            ]
-        }
+        const trip = await Trip.findByPk(data.trip_id, { include: [{ association: "bus" }] }
+
         );
+        if (!trip) {
+            throw new Error("Voyage introuvable.");
+        }
 
-        if (!booking) {
+        // Vérification compagnie
+
+        if (
+            currentUser.role !== roles.SUPER_ADMIN &&
+            trip.compagny_id !== currentUser.compagny_id
+        ) {
             throw new Error(
-                "Réservation introuvable"
+                "Accès refusé."
             );
         }
 
-        const ticket_number = "TK-" + Date.now();
-        const qrData = { token: ticket_number };
+        // Vérifier capacité bus
 
-        const qr_code = await QRCode.toDataURL(
-            JSON.stringify(qrData)
-        );
+        const totalBookings =
+            await Booking.count({
+                where: {
+                    trip_id: data.trip_id,
+                    status: {
+                        [Op.ne]: bookingStatus.CANCELLED
+                    }
 
-        return await super.create({
-            booking_id,
-            compagny_id:
-                booking.compagny_id,
-            ticket_number,
-            qr_code,
-            status: "ACTIVE"
+                }
+            });
+
+        if (totalBookings >= trip.bus.capacity) {
+            throw new Error(
+                "Ce voyage est complet."
+            );
+        }
+
+        const booking = await super.create({
+            trip_id: data.trip_id,
+            passenger_id: data.passenger_id,
+            compagny_id: trip.compagny_id,
+            status: bookingStatus.CONFIRMED
         });
+        return booking;
+
     }
     async update(id, data, currentUser) {
 
@@ -56,49 +72,27 @@ class BookingService extends BaseService {
             booking.status === bookingStatus.CANCELLED ||
             booking.status === bookingStatus.COMPLETED
         ) {
-            throw new Error("Impossible de modifier cette réservation.");
+            throw new Error(
+                "Impossible de modifier cette réservation."
+            );
         }
 
         const payload = {};
 
-        if (
-            data.seat_number &&
-            data.seat_number !== booking.seat_number
-        ) {
-
-            const seatExist = await Booking.findOne({
-
-                where: {
-
-                    trip_id: booking.trip_id,
-
-                    seat_number: data.seat_number,
-
-                    status: {
-                        [Op.ne]: bookingStatus.CANCELLED
-                    },
-
-                    id: {
-                        [Op.ne]: id
-                    }
-
-                }
-
-            });
-
-            if (seatExist) {
-                throw new Error("Ce siège est déjà réservé.");
-            }
-
-            payload.seat_number = data.seat_number;
-
+        // Modification du passager si nécessaire
+        if (data.passenger_id) {
+            payload.passenger_id = data.passenger_id;
         }
 
-        if (data.status) {
-            payload.status = data.status;
+        // Modification du voyage si autorisé
+        if (data.trip_id) {
+            payload.trip_id = data.trip_id;
         }
 
-        return await super.update(id, payload);
+        return await super.update(
+            id,
+            payload
+        );
 
     }
     async getById(id, currentUser) {
@@ -129,32 +123,6 @@ class BookingService extends BaseService {
         }
 
         return booking;
-
-    }
-    async confirmBooking(id, currentUser) {
-
-        const booking = await this.getById(id, currentUser);
-
-        if (!booking) {
-            throw new Error(
-                "Réservation introuvable"
-            );
-        }
-        if (booking.status === "CONFIRMED") {
-            throw new Error(
-                "Réservation déjà confirmée"
-            );
-        }
-        await booking.update({
-            status: "CONFIRMED"
-        });
-        // Création automatique du ticket
-        const ticket = await ticketService.createFromBooking(booking.id);
-
-        return {
-            booking,
-            ticket
-        };
 
     }
     async cancelBooking(id, currentUser) {

@@ -58,19 +58,6 @@ router.put(
     bookingController.updateBooking
 );
 
-// Confirmer une réservation
-router.patch(
-    "/:id/confirm",
-    authenticate,
-    authorize(
-        roles.SUPER_ADMIN,
-        roles.COMPAGNY_ADMIN,
-        roles.AGENCY_ADMIN,
-        roles.AGENT
-    ),
-    bookingController.confirmBooking
-);
-
 // Annuler une réservation
 router.patch(
     "/:id/cancel",
