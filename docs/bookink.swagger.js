@@ -22,7 +22,6 @@
  *             required:
  *               - trip_id
  *               - passenger_id
- *               - seat_number
  *             properties:
  *               compagny_id:
  *                 type: integer
@@ -33,9 +32,6 @@
  *               passenger_id:
  *                 type: integer
  *                 example: 5
- *               seat_number:
- *                 type: string
- *                 example: A05
  *               status:
  *                 type: string
  *                 enum:
@@ -138,9 +134,6 @@
  *           schema:
  *             type: object
  *             properties:
- *               seat_number:
- *                 type: string
- *                 example: B08
  *               status:
  *                 type: string
  *                 enum:

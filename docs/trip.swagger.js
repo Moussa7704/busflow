@@ -355,10 +355,6 @@
  *                             type: integer
  *                             example: 100
  *
- *                           seat_number:
- *                             type: string
- *                             example: A12
- *
  *                           booking_reference:
  *                             type: string
  *                             example: BK202607080001
