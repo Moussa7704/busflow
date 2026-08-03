@@ -3,7 +3,7 @@ const BaseService = require("./base-service");
 const { Trip, Bus, TripRoute, User, Booking } = require("../models");
 
 const roles = require("../constants/roles");
-const tripStatus = require("../constants/status");
+const { tripStatus } = require("../constants/status");
 
 class TripService extends BaseService {
 

@@ -3,7 +3,7 @@ const { Ticket, Booking, Trip, Passenger } = require("../models");
 const BaseService = require("./base-service");
 const QRCode = require("qrcode");
 const roles = require("../constants/roles");
-const ticketStatus = require("../constants/status");
+const { ticketStatus } = require("../constants/status");
 
 class TicketService extends BaseService {
 

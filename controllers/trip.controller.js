@@ -4,14 +4,14 @@ const roles = require("../constants/roles")
 
 const createTrip = async (req, res) => {
     try {
-        const trip = await tripService.createTrip(req.body, req.user);
-        sendResponse({
+        const trip = await tripService.create(req.body, req.user);
+        sendResponse(res, {
             message: "Voyage créé avec succès",
             data: trip,
             status: 201
         });
     } catch (error) {
-        sendResponse({
+        sendResponse(res, {
             success: false,
             message: error.message,
             status: 400

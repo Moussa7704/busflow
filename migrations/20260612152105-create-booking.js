@@ -56,17 +56,17 @@ module.exports = {
       //   ),
       //   defaultValue: "PENDING"
       // },
-      payment_method: {
-        type: Sequelize.ENUM(
-          "CASH",
-          "Orange Money"
-        ),
-        defaultValue: "CASH"
-      },
-      paid_amount: {
-        type: Sequelize.DECIMAL,
-        defaultValue: 0.00
-      },
+      // payment_method: {
+      //   type: Sequelize.ENUM(
+      //     "CASH",
+      //     "Orange Money"
+      //   ),
+      //   defaultValue: "CASH"
+      // },
+      // paid_amount: {
+      //   type: Sequelize.DECIMAL,
+      //   defaultValue: 0.00
+      // },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
