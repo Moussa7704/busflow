@@ -2,6 +2,7 @@ const { Booking, Trip, Passenger, Ticket, User, sequelize } = require("../models
 const BaseService = require("./base-service");
 const { bookingStatus } = require("../constants/status");
 const roles = require("../constants/roles");
+const { generateBookingReference } = require("../utils/reference");
 const QRCode = require("qrcode");
 
 const { Op } = require("sequelize");
@@ -36,6 +37,14 @@ class BookingService extends BaseService {
                 );
             }
 
+            const seats = data.seats || 1;
+
+            if (!Number.isInteger(seats) || seats < 1) {
+                throw new Error(
+                    "Le nombre de places doit être un entier positif."
+                );
+            }
+
             // Vérifier capacité bus
 
             const totalBookings =
@@ -50,9 +59,9 @@ class BookingService extends BaseService {
                     transaction
                 });
 
-            if (totalBookings >= trip.bus.capacity) {
+            if (totalBookings + seats > trip.bus.capacity) {
                 throw new Error(
-                    "Ce voyage est complet."
+                    "Places insuffisantes pour ce voyage."
                 );
             }
 
@@ -84,18 +93,37 @@ class BookingService extends BaseService {
 
             }
 
-            const booking = await Booking.create({
-                trip_id: data.trip_id,
-                passenger_id: passenger.id,
-                compagny_id: trip.compagny_id,
-                status: bookingStatus.CONFIRMED
-            }, { transaction });
+            const bookings = [];
+
+            for (let i = 0; i < seats; i++) {
+
+                const booking = await Booking.create({
+                    trip_id: data.trip_id,
+                    passenger_id: passenger.id,
+                    compagny_id: trip.compagny_id,
+                    status: bookingStatus.CONFIRMED,
+                    booking_reference: generateBookingReference(),
+                    seat_number: totalBookings + i + 1
+                }, { transaction });
+
+                booking.passenger = passenger;
+
+                bookings.push(booking);
+
+            }
+
+            await trip.update({
+
+                available_seats:
+                    trip.available_seats - seats
+
+            }, {
+                transaction
+            });
 
             await transaction.commit();
 
-            booking.passenger = passenger;
-
-            return booking;
+            return bookings;
 
         } catch (error) {
 

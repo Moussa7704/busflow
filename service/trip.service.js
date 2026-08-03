@@ -630,7 +630,7 @@ class TripService extends BaseService {
             ],
 
             order: [
-                ["id", "ASC"]
+                ["seat_number", "ASC"]
             ]
 
         });
@@ -657,6 +657,8 @@ class TripService extends BaseService {
             passengers: bookings.map(item => ({
 
                 booking_id: item.id,
+
+                seat_number: item.seat_number,
 
                 booking_reference:
                     item.booking_reference,

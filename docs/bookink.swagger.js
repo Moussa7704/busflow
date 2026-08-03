@@ -41,6 +41,11 @@
  *               identity_number:
  *                 type: string
  *                 example: ML123456
+ *               seats:
+ *                 type: integer
+ *                 description: Nombre de places à réserver sous ce même passager (voyage en groupe). Chaque place génère sa propre réservation et son propre billet.
+ *                 default: 1
+ *                 example: 3
  *     responses:
  *       201:
  *         description: Réservation créée avec succès
