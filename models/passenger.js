@@ -17,6 +17,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Passenger.init({
+    compagny_id: DataTypes.INTEGER,
     first_name: DataTypes.STRING,
     last_name: DataTypes.STRING,
     phone: DataTypes.STRING,

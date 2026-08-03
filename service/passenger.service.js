@@ -42,9 +42,7 @@ class PassengerService extends BaseService {
             first_name: data.first_name,
             last_name: data.last_name,
             phone: data.phone,
-            email: data.email,
-            gender: data.gender,
-            birth_date: data.birth_date
+            identity_number: data.identity_number
         };
         return await super.create(payload);
     }

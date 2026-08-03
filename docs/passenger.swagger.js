@@ -46,18 +46,9 @@
  *                 type: string
  *                 example: "77000000"
  *
- *               email:
+ *               identity_number:
  *                 type: string
- *                 example: moussa@gmail.com
- *
- *               gender:
- *                 type: string
- *                 example: MALE
- *
- *               birth_date:
- *                 type: string
- *                 format: date
- *                 example: 1995-05-15
+ *                 example: "1ABRF74D"
  *
  *     responses:
  *

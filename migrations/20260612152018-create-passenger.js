@@ -21,6 +21,16 @@ module.exports = {
       identity_number: {
         type: Sequelize.STRING
       },
+      compagny_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Compagnies',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
