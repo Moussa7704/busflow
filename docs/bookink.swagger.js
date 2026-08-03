@@ -21,25 +21,26 @@
  *             type: object
  *             required:
  *               - trip_id
- *               - passenger_id
+ *               - phone
  *             properties:
- *               compagny_id:
- *                 type: integer
- *                 example: 1
  *               trip_id:
  *                 type: integer
  *                 example: 1
- *               passenger_id:
- *                 type: integer
- *                 example: 5
- *               status:
+ *               phone:
  *                 type: string
- *                 enum:
- *                   - PENDING
- *                   - CONFIRMED
- *                   - CANCELLED
- *                   - COMPLETED
- *                 example: PENDING
+ *                 description: Numéro du passager. S'il existe déjà pour la compagnie, ses infos sont réutilisées, sinon un nouveau passager est créé avec first_name/last_name.
+ *                 example: 77123456
+ *               first_name:
+ *                 type: string
+ *                 description: Obligatoire uniquement si le passager n'existe pas encore
+ *                 example: Awa
+ *               last_name:
+ *                 type: string
+ *                 description: Obligatoire uniquement si le passager n'existe pas encore
+ *                 example: Traoré
+ *               identity_number:
+ *                 type: string
+ *                 example: ML123456
  *     responses:
  *       201:
  *         description: Réservation créée avec succès

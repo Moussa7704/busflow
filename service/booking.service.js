@@ -14,50 +14,97 @@ class BookingService extends BaseService {
     }
     async create(data, currentUser) {
 
-        const trip = await Trip.findByPk(data.trip_id, { include: [{ association: "bus" }] }
+        const transaction = await sequelize.transaction();
 
-        );
-        if (!trip) {
-            throw new Error("Voyage introuvable.");
-        }
+        try {
 
-        // Vérification compagnie
+            const trip = await Trip.findByPk(data.trip_id, {
+                include: [{ association: "bus" }],
+                transaction
+            });
+            if (!trip) {
+                throw new Error("Voyage introuvable.");
+            }
 
-        if (
-            currentUser.role !== roles.SUPER_ADMIN &&
-            trip.compagny_id !== currentUser.compagny_id
-        ) {
-            throw new Error(
-                "Accès refusé."
-            );
-        }
+            // Vérification compagnie
 
-        // Vérifier capacité bus
+            if (
+                currentUser.role !== roles.SUPER_ADMIN &&
+                trip.compagny_id !== currentUser.compagny_id
+            ) {
+                throw new Error(
+                    "Accès refusé."
+                );
+            }
 
-        const totalBookings =
-            await Booking.count({
+            // Vérifier capacité bus
+
+            const totalBookings =
+                await Booking.count({
+                    where: {
+                        trip_id: data.trip_id,
+                        status: {
+                            [Op.ne]: bookingStatus.CANCELLED
+                        }
+
+                    },
+                    transaction
+                });
+
+            if (totalBookings >= trip.bus.capacity) {
+                throw new Error(
+                    "Ce voyage est complet."
+                );
+            }
+
+            // Récupération ou création du passager via son numéro de téléphone
+
+            let passenger = await Passenger.findOne({
                 where: {
-                    trip_id: data.trip_id,
-                    status: {
-                        [Op.ne]: bookingStatus.CANCELLED
-                    }
-
-                }
+                    phone: data.phone,
+                    compagny_id: trip.compagny_id
+                },
+                transaction
             });
 
-        if (totalBookings >= trip.bus.capacity) {
-            throw new Error(
-                "Ce voyage est complet."
-            );
-        }
+            if (!passenger) {
 
-        const booking = await super.create({
-            trip_id: data.trip_id,
-            passenger_id: data.passenger_id,
-            compagny_id: trip.compagny_id,
-            status: bookingStatus.CONFIRMED
-        });
-        return booking;
+                if (!data.first_name || !data.last_name) {
+                    throw new Error(
+                        "Le nom et le prénom sont obligatoires pour un nouveau passager."
+                    );
+                }
+
+                passenger = await Passenger.create({
+                    compagny_id: trip.compagny_id,
+                    first_name: data.first_name,
+                    last_name: data.last_name,
+                    phone: data.phone,
+                    identity_number: data.identity_number
+                }, { transaction });
+
+            }
+
+            const booking = await Booking.create({
+                trip_id: data.trip_id,
+                passenger_id: passenger.id,
+                compagny_id: trip.compagny_id,
+                status: bookingStatus.CONFIRMED
+            }, { transaction });
+
+            await transaction.commit();
+
+            booking.passenger = passenger;
+
+            return booking;
+
+        } catch (error) {
+
+            await transaction.rollback();
+
+            throw error;
+
+        }
 
     }
     async update(id, data, currentUser) {
