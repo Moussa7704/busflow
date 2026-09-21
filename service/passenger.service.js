@@ -2,6 +2,7 @@ const { Passenger } = require("../models");
 const BaseService = require("./base-service");
 const { Op } = require("sequelize");
 const roles = require("../constants/roles");
+const { assertCompagnyActive } = require("../utils/assertCompagnyActive");
 
 
 class PassengerService extends BaseService {
@@ -23,6 +24,8 @@ class PassengerService extends BaseService {
             compagny_id = currentUser.compagny_id;
         }
 
+        await assertCompagnyActive(compagny_id);
+
         const existPassenger = await this.model.findOne({
 
             where: {
@@ -42,6 +45,7 @@ class PassengerService extends BaseService {
             first_name: data.first_name,
             last_name: data.last_name,
             phone: data.phone,
+            email: data.email,
             identity_number: data.identity_number
         };
         return await super.create(payload);
@@ -62,6 +66,18 @@ class PassengerService extends BaseService {
             throw new Error("Accès refusé.");
         }
         return passenger;
+    }
+    async getByPhone(phone, currentUser, compagny_id) {
+
+        const where = { phone };
+
+        if (currentUser.role !== roles.SUPER_ADMIN) {
+            where.compagny_id = currentUser.compagny_id;
+        } else if (compagny_id) {
+            where.compagny_id = compagny_id;
+        }
+
+        return await this.model.findOne({ where });
     }
     async Paginate(page, limit, filters = {}) {
 
@@ -89,12 +105,6 @@ class PassengerService extends BaseService {
 
                 {
                     phone:{
-                        [Op.iLike]: `%${filters.search}%`
-                    }
-                },
-
-                {
-                    email:{
                         [Op.iLike]: `%${filters.search}%`
                     }
                 }

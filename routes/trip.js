@@ -33,6 +33,19 @@ router.get(
     tripController.listTrips
 );
 
+// Liste globale des passagers par route + date (+ heure optionnelle)
+router.get(
+    "/manifest",
+    authenticate,
+    authorize(
+        roles.SUPER_ADMIN,
+        roles.COMPAGNY_ADMIN,
+        roles.AGENCY_ADMIN,
+        roles.CONTROLLER
+    ),
+    tripController.getTripManifestByRoute
+);
+
 // Détail
 router.get(
     "/:id",

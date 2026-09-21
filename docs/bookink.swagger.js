@@ -41,11 +41,27 @@
  *               identity_number:
  *                 type: string
  *                 example: ML123456
+ *               email:
+ *                 type: string
+ *                 description: Obligatoire uniquement si le passager n'existe pas encore. Utilisée pour envoyer le billet/QR code par email après confirmation.
+ *                 example: awa.traore@email.com
  *               seats:
  *                 type: integer
  *                 description: Nombre de places à réserver sous ce même passager (voyage en groupe). Chaque place génère sa propre réservation et son propre billet.
  *                 default: 1
  *                 example: 3
+ *               payment_methode:
+ *                 type: string
+ *                 description: Méthode de paiement utilisée pour la réservation
+ *                 enum:
+ *                   - CASH
+ *                   - MOBILE_MONEY
+ *                   - CARD
+ *                 example: MOBILE_MONEY
+ *               paid_amount:
+ *                 type: number
+ *                 description: Montant payé pour la réservation. Par défaut, le prix du voyage est utilisé.
+ *                 example: 5000
  *     responses:
  *       201:
  *         description: Réservation créée avec succès

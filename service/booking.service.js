@@ -1,8 +1,9 @@
 const { Booking, Trip, Passenger, Ticket, User, sequelize } = require("../models");
 const BaseService = require("./base-service");
-const { bookingStatus } = require("../constants/status");
+const { bookingStatus, paymentMethod, ticketStatus, tripStatus } = require("../constants/status");
 const roles = require("../constants/roles");
 const { generateBookingReference } = require("../utils/reference");
+const notificationService = require("./notification.service");
 const QRCode = require("qrcode");
 
 const { Op } = require("sequelize");
@@ -19,11 +20,25 @@ class BookingService extends BaseService {
         try {
 
             const trip = await Trip.findByPk(data.trip_id, {
-                include: [{ association: "bus" }],
+                include: [
+                    { association: "bus" },
+                    { association: "TripRoute" },
+                    { association: "compagny" }
+                ],
                 transaction
             });
             if (!trip) {
                 throw new Error("Voyage introuvable.");
+            }
+
+            if (
+                trip.status === tripStatus.DEPARTED ||
+                trip.status === tripStatus.ARRIVED ||
+                trip.status === tripStatus.CANCELLED
+            ) {
+                throw new Error(
+                    "Impossible de réserver sur ce voyage (déjà parti, arrivé ou annulé)."
+                );
             }
 
             // Vérification compagnie
@@ -43,6 +58,19 @@ class BookingService extends BaseService {
                 throw new Error(
                     "Le nombre de places doit être un entier positif."
                 );
+            }
+
+            if (
+                data.payment_methode &&
+                !Object.values(paymentMethod).includes(data.payment_methode)
+            ) {
+                throw new Error("Méthode de paiement invalide.");
+            }
+
+            const paidAmount = data.paid_amount !== undefined ? data.paid_amount : trip.price;
+
+            if (isNaN(paidAmount) || paidAmount < 0) {
+                throw new Error("Le montant payé est invalide.");
             }
 
             // Vérifier capacité bus
@@ -88,6 +116,7 @@ class BookingService extends BaseService {
                     first_name: data.first_name,
                     last_name: data.last_name,
                     phone: data.phone,
+                    email: data.email,
                     identity_number: data.identity_number
                 }, { transaction });
 
@@ -103,10 +132,29 @@ class BookingService extends BaseService {
                     compagny_id: trip.compagny_id,
                     status: bookingStatus.CONFIRMED,
                     booking_reference: generateBookingReference(),
-                    seat_number: totalBookings + i + 1
+                    seat_number: totalBookings + i + 1,
+                    payment_methode: data.payment_methode,
+                    paid_amount: paidAmount,
+                    created_by: currentUser.id
                 }, { transaction });
 
                 booking.passenger = passenger;
+
+                const ticket_number = "TK-" + Date.now() + "-" + booking.id;
+
+                const qr_code = await QRCode.toDataURL(
+                    ticket_number
+                );
+
+                const ticket = await Ticket.create({
+                    booking_id: booking.id,
+                    compagny_id: trip.compagny_id,
+                    ticket_number,
+                    qr_code,
+                    status: ticketStatus.ACTIVE
+                }, { transaction });
+
+                booking.ticket = ticket;
 
                 bookings.push(booking);
 
@@ -122,6 +170,17 @@ class BookingService extends BaseService {
             });
 
             await transaction.commit();
+
+            notificationService.sendBookingConfirmation({
+                passenger,
+                trip,
+                tickets: bookings.map(booking => ({
+                    ticket_number: booking.ticket.ticket_number,
+                    qr_code: booking.ticket.qr_code,
+                    seat_number: booking.seat_number,
+                    booking_reference: booking.booking_reference
+                }))
+            });
 
             return bookings;
 
@@ -163,6 +222,26 @@ class BookingService extends BaseService {
             payload.trip_id = data.trip_id;
         }
 
+        if (data.payment_methode) {
+
+            if (!Object.values(paymentMethod).includes(data.payment_methode)) {
+                throw new Error("Méthode de paiement invalide.");
+            }
+
+            payload.payment_methode = data.payment_methode;
+
+        }
+
+        if (data.paid_amount !== undefined) {
+
+            if (isNaN(data.paid_amount) || data.paid_amount < 0) {
+                throw new Error("Le montant payé est invalide.");
+            }
+
+            payload.paid_amount = data.paid_amount;
+
+        }
+
         return await super.update(
             id,
             payload
@@ -175,7 +254,10 @@ class BookingService extends BaseService {
 
             include: [
 
-                "trip",
+                {
+                    association: "trip",
+                    include: ["TripRoute"]
+                },
 
                 "passenger",
 
@@ -215,6 +297,12 @@ class BookingService extends BaseService {
                 throw new Error("Réservation déjà annulée.");
             }
 
+            if (booking.ticket && booking.ticket.status === ticketStatus.USED) {
+                throw new Error(
+                    "Impossible d'annuler une réservation dont le ticket a déjà été utilisé."
+                );
+            }
+
             const trip = await Trip.findByPk(
                 booking.trip_id,
                 { transaction }
@@ -236,6 +324,18 @@ class BookingService extends BaseService {
             }, {
                 transaction
             });
+
+            if (booking.ticket && booking.ticket.status !== ticketStatus.CANCELLED) {
+
+                await booking.ticket.update({
+
+                    status: ticketStatus.CANCELLED
+
+                }, {
+                    transaction
+                });
+
+            }
 
             await transaction.commit();
 
@@ -325,7 +425,10 @@ class BookingService extends BaseService {
 
             include: [
 
-                "trip",
+                {
+                    association: "trip",
+                    include: ["TripRoute"]
+                },
 
                 "passenger",
 

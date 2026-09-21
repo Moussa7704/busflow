@@ -26,7 +26,6 @@
  *               - driver_id
  *               - departure_time
  *               - arrival_time
- *               - price
  *             properties:
  *               compagny_id:
  *                 type: integer

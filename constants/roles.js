@@ -5,5 +5,6 @@ module.exports = {
     AGENT: "AGENT",
     CAISSIER: "CAISSIER",
     CONTROLLER: "CONTROLLER",
-    DRIVER: "DRIVER"
+    DRIVER: "DRIVER",
+    COURRIER: "COURRIER"
 };

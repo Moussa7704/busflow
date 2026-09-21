@@ -37,10 +37,10 @@ module.exports = (sequelize, DataTypes) => {
     booking_reference: DataTypes.STRING,
     status: DataTypes.STRING,
     created_by: DataTypes.INTEGER,
+    payment_methode: DataTypes.STRING,
+    paid_amount: DataTypes.DECIMAL,
     //booking_channel: DataTypes.STRING,
     //payment_status: DataTypes.STRING,
-    payment_method: DataTypes.STRING,
-    paid_amount: DataTypes.DECIMAL
   }, {
     sequelize,
     modelName: 'Booking',

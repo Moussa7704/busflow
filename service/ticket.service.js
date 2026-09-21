@@ -3,7 +3,8 @@ const { Ticket, Booking, Trip, Passenger } = require("../models");
 const BaseService = require("./base-service");
 const QRCode = require("qrcode");
 const roles = require("../constants/roles");
-const { ticketStatus } = require("../constants/status");
+const notificationService = require("./notification.service");
+const { ticketStatus, tripStatus, bookingStatus } = require("../constants/status");
 
 class TicketService extends BaseService {
 
@@ -18,7 +19,13 @@ class TicketService extends BaseService {
                 booking_id,
                 {
                     include: [
-                        "trip",
+                        {
+                            association: "trip",
+                            include: [
+                                "TripRoute",
+                                "compagny"
+                            ]
+                        },
                         "passenger"
                     ]
                 }
@@ -67,22 +74,11 @@ class TicketService extends BaseService {
 
         const ticket_number = "TK-" + Date.now();
 
-        const qrData = {
-            ticket_number,
-            booking_id,
-            passenger:
-                booking.passenger.first_name
-                + " " +
-                booking.passenger.last_name,
-            trip_id:
-                booking.trip_id
-        };
-
         const qr_code = await QRCode.toDataURL(
-            JSON.stringify(qrData)
+            ticket_number
         );
 
-        return await super.create({
+        const ticket = await super.create({
             booking_id,
             compagny_id:
                 booking.compagny_id,
@@ -91,6 +87,19 @@ class TicketService extends BaseService {
             status:
                 ticketStatus.ACTIVE
         });
+
+        notificationService.sendBookingConfirmation({
+            passenger: booking.passenger,
+            trip: booking.trip,
+            tickets: [{
+                ticket_number: ticket.ticket_number,
+                qr_code: ticket.qr_code,
+                seat_number: booking.seat_number,
+                booking_reference: booking.booking_reference
+            }]
+        });
+
+        return ticket;
     }
     async getById(id, currentUser) {
         const ticket = await this.model.findByPk(
@@ -100,7 +109,10 @@ class TicketService extends BaseService {
                     {
                         association: "booking",
                         include: [
-                            "trip",
+                            {
+                                association: "trip",
+                                include: ["TripRoute"]
+                            },
                             "passenger"
                         ]
                     }
@@ -158,7 +170,10 @@ class TicketService extends BaseService {
                 {
                     association: "booking",
                     include: [
-                        "trip",
+                        {
+                            association: "trip",
+                            include: ["TripRoute"]
+                        },
                         "passenger"
                     ]
                 }
@@ -183,7 +198,10 @@ class TicketService extends BaseService {
                 {
                     association: "booking",
                     include: [
-                        "trip",
+                        {
+                            association: "trip",
+                            include: ["TripRoute"]
+                        },
                         "passenger"
                     ]
                 }
@@ -195,6 +213,7 @@ class TicketService extends BaseService {
                 "Ticket introuvable."
             );
         }
+
         if (
             currentUser.role !== roles.SUPER_ADMIN &&
             ticket.compagny_id !== currentUser.compagny_id
@@ -204,26 +223,62 @@ class TicketService extends BaseService {
             );
 
         }
-        if (
-            ticket.status === ticketStatus.USED
-        ) {
+
+        if (!ticket.booking) {
             throw new Error(
-                "Ticket déjà utilisé."
+                "Réservation introuvable."
             );
         }
-        if (
-            ticket.status === ticketStatus.CANCELLED
-        ) {
+
+        if (ticket.booking.status === bookingStatus.CANCELLED) {
             throw new Error(
-                "Ticket annulé."
+                "La Réservation est annulée."
             );
         }
+
+        if (
+            ticket.status === ticketStatus.USED ||
+            ticket.used
+        ) {
+            throw new Error(
+                "Le ticket est déjà utilisé."
+            );
+        }
+
+        if (ticket.status !== ticketStatus.ACTIVE) {
+            throw new Error(
+                "Le ticket est annulé."
+            );
+        }
+
+        if (
+            ticket.booking.trip.status !== tripStatus.SCHEDULED &&
+            ticket.booking.trip.status !== tripStatus.BOARDING
+        ) {
+            throw new Error(
+                "Le voyage ne permet pas l'embarquement."
+            );
+        }
+
+        // const tripDate = new Date(ticket.booking.trip.departure_time);
+        // const now = new Date();
+
+        // if (
+        //     tripDate.getFullYear() !== now.getFullYear() ||
+        //     tripDate.getMonth() !== now.getMonth() ||
+        //     tripDate.getDate() !== now.getDate()
+        // ) {
+        //     throw new Error(
+        //         "Le scan doit être effectué le jour du voyage."
+        //     );
+        // }
+
         await ticket.update({
-            status:
-                ticketStatus.USED,
-            scanned_at:
-                new Date()
+            status: ticketStatus.USED,
+            used: true,
+            scanned_at: new Date()
         });
+
         return ticket;
     }
     async cancelTicket(id, currentUser) {

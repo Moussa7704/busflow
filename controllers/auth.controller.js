@@ -1,10 +1,19 @@
-const { User, Otp, RefreshToken } = require("../models")
+const { User, Otp, RefreshToken, PasswordReset } = require("../models")
 const bcrypt = require("bcrypt")
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const { sendOtpEmail } = require('../utils/sendEmail');
-const { generateAccessToken, generateRefreshToken, verifyRefreshToken } = require("../utils/jwt");
+const { sendOtpEmail, sendResetEmail } = require('../utils/sendEmail');
+const { generateAccessToken, generateRefreshToken, generateResetToken, verifyRefreshToken } = require("../utils/jwt");
 const { sendResponse } = require("../utils/message");
+
+const REFRESH_TOKEN_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+
+const refreshCookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: REFRESH_TOKEN_MAX_AGE_MS
+};
 
 const login = async (req, res) => {
     const payload = {
@@ -29,13 +38,16 @@ const login = async (req, res) => {
     }
 
     const code = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+
     await Otp.create({
         user_id: user.id,
         code,
         type: "LOGIN",
         expires_at: expiresAt
     })
+
+    await sendOtpEmail(user.email, code);
 
     res.status(200).json({
         message: "Veuillez verifier le code a 6 chiffre qui vous ete envoie votre adresse email ",
@@ -87,15 +99,16 @@ const verifyOtp = async (req, res) => {
         await RefreshToken.create({
             user_id: user.id,
             token: refreshToken,
-            expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+            expires_at: new Date(Date.now() + REFRESH_TOKEN_MAX_AGE_MS)
         })
 
         await otp.destroy()
 
+        res.cookie("refreshToken", refreshToken, refreshCookieOptions);
+
         return res.json({
             message: "Connexion réussie",
-            accessToken,
-            refreshToken
+            accessToken
         });
     } catch (err) {
         return res.status(500).json({ error: err.message });
@@ -103,7 +116,7 @@ const verifyOtp = async (req, res) => {
 }
 const refresh = async (req, res) => {
     try {
-        const { refreshToken } = req.body;
+        const refreshToken = req.cookies?.refreshToken;
 
         if (!refreshToken) {
             return res.status(401).json({ message: "No token" });
@@ -114,65 +127,222 @@ const refresh = async (req, res) => {
         });
 
         if (!token) {
+            res.clearCookie("refreshToken", refreshCookieOptions);
             return res.status(403).json({ message: "Invalid refresh token" });
         }
 
         if (new Date() > token.expires_at) {
+            res.clearCookie("refreshToken", refreshCookieOptions);
             return res.status(403).json({ message: "Token expired" });
         }
 
         const decoded = verifyRefreshToken(refreshToken)
 
-        //token.revoked = true;
-        //await token.save();
+        // Rotation : ce refresh token ne peut servir qu'une seule fois.
+        token.revoked = true;
+        await token.save();
 
-        const newAccessToken = generateAccessToken({
-            id: decoded.id,
-            role: decoded.role,
-            compagny_id: decoded.compagny_id,
-            agency_id: decoded.agency_id
+        const user = await User.findByPk(decoded.id, {
+            include: ['Role']
         });
+
+        if (!user || !user.is_active) {
+            res.clearCookie("refreshToken", refreshCookieOptions);
+            return res.status(403).json({ message: "Utilisateur introuvable ou inactif" });
+        }
+
+        const data = {
+            id: user.id,
+            role: user.Role?.name,
+            compagny_id: user.compagny_id,
+            agency_id: user.agency_id
+        };
+
+        const newAccessToken = generateAccessToken(data);
+        const newRefreshToken = generateRefreshToken(data);
+
+        await RefreshToken.create({
+            user_id: user.id,
+            token: newRefreshToken,
+            expires_at: new Date(Date.now() + REFRESH_TOKEN_MAX_AGE_MS)
+        });
+
+        res.cookie("refreshToken", newRefreshToken, refreshCookieOptions);
 
         res.json({
             accessToken: newAccessToken
         });
     } catch (err) {
+        res.clearCookie("refreshToken", refreshCookieOptions);
         return res.status(403).json({
             message: "Invalid or expired token"
         });
     }
 };
 const logout = async (req, res) => {
-    const { refreshToken } = req.body;
+    const refreshToken = req.cookies?.refreshToken;
 
-    await RefreshToken.update(
-        { revoked: true },
-        { where: { token: refreshToken } }
-    );
+    if (refreshToken) {
+        await RefreshToken.update(
+            { revoked: true },
+            { where: { token: refreshToken } }
+        );
+    }
+
+    res.clearCookie("refreshToken", refreshCookieOptions);
 
     res.json({ message: "Logged out" });
 };
 const me = async (req, res) => {
     try {
-        const user = req.user;
+
+        const user = await User.findByPk(req.user.id, {
+            include: ["Role", "Agency", "Compagny"],
+            attributes: {
+                exclude: ["password"]
+            }
+        });
+
         if (!user) {
-            return res.status(401).json({
-                message: "Utilisateur non authentifié"
+            return sendResponse(res, {
+                success: false,
+                message: "Utilisateur introuvable",
+                status: 404
             });
         }
+
         return sendResponse(res, {
             message: "Utilisateur connecté",
-            data: req.user,
+            data: user,
             status: 200
         });
 
     } catch (err) {
         return sendResponse(res, {
             success: false,
-            message: error.message,
+            message: err.message,
             status: 500
         });
 
+    }
+};
+const updateMe = async (req, res) => {
+    try {
+
+        const user = await User.findByPk(req.user.id);
+
+        if (!user) {
+            return sendResponse(res, {
+                success: false,
+                message: "Utilisateur introuvable",
+                status: 404
+            });
+        }
+
+        const { first_name, last_name, phone, email } = req.body;
+
+        if (email && email !== user.email) {
+
+            const existing = await User.findOne({
+                where: { email }
+            });
+
+            if (existing) {
+                return sendResponse(res, {
+                    success: false,
+                    message: "Cette adresse email est déjà utilisée.",
+                    status: 400
+                });
+            }
+
+        }
+
+        await user.update({
+            first_name: first_name ?? user.first_name,
+            last_name: last_name ?? user.last_name,
+            phone: phone ?? user.phone,
+            email: email ?? user.email
+        });
+
+        const updated = await User.findByPk(user.id, {
+            include: ["Role", "Agency", "Compagny"],
+            attributes: {
+                exclude: ["password"]
+            }
+        });
+
+        return sendResponse(res, {
+            message: "Profil mis à jour avec succès",
+            data: updated,
+            status: 200
+        });
+
+    } catch (err) {
+        return sendResponse(res, {
+            success: false,
+            message: err.message,
+            status: 400
+        });
+    }
+};
+const changeMyPassword = async (req, res) => {
+    try {
+
+        const { current_password, new_password } = req.body;
+
+        if (!current_password || !new_password) {
+            return sendResponse(res, {
+                success: false,
+                message: "Mot de passe actuel et nouveau mot de passe requis.",
+                status: 400
+            });
+        }
+
+        if (new_password.length < 6) {
+            return sendResponse(res, {
+                success: false,
+                message: "Le nouveau mot de passe doit contenir au moins 6 caractères.",
+                status: 400
+            });
+        }
+
+        const user = await User.findByPk(req.user.id);
+
+        if (!user) {
+            return sendResponse(res, {
+                success: false,
+                message: "Utilisateur introuvable",
+                status: 404
+            });
+        }
+
+        const validPassword = await bcrypt.compare(current_password, user.password);
+
+        if (!validPassword) {
+            return sendResponse(res, {
+                success: false,
+                message: "Mot de passe actuel incorrect.",
+                status: 400
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(new_password, 10);
+
+        await user.update({
+            password: hashedPassword
+        });
+
+        return sendResponse(res, {
+            message: "Mot de passe modifié avec succès",
+            status: 200
+        });
+
+    } catch (err) {
+        return sendResponse(res, {
+            success: false,
+            message: err.message,
+            status: 400
+        });
     }
 };
 const forgetPassword = async (req, res) => {
@@ -192,7 +362,7 @@ const forgetPassword = async (req, res) => {
         });
 
         // Generate a unique token for password reset
-        const resetToken = generateResetToken(user.id)
+        const resetToken = generateResetToken({ id: user.id })
 
 
         const hashedToken = crypto
@@ -333,6 +503,8 @@ module.exports = {
     refresh,
     logout,
     me,
+    updateMe,
+    changeMyPassword,
     forgetPassword,
     resetPassword,
     resendOtp

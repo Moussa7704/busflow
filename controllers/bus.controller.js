@@ -87,7 +87,8 @@ const listBus = async (req, res) => {
             search: req.query.search,
             status: req.query.status,
             type: req.query.type,
-            capacity: req.query.capacity
+            capacity: req.query.capacity,
+            available_for_trip: req.query.available_for_trip
         };
 
         if (req.user.role !== roles.SUPER_ADMIN) {

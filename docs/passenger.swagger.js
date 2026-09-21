@@ -46,6 +46,11 @@
  *                 type: string
  *                 example: "77000000"
  *
+ *               email:
+ *                 type: string
+ *                 description: Utilisée pour envoyer les confirmations de réservation et les billets/QR codes
+ *                 example: moussa@email.com
+ *
  *               identity_number:
  *                 type: string
  *                 example: "1ABRF74D"
@@ -114,6 +119,47 @@
  *
  *       401:
  *         description: Non authentifié
+ *
+ *       403:
+ *         description: Accès refusé
+ */
+
+/**
+ * @swagger
+ * /passengers/phone/{phone}:
+ *
+ *   get:
+ *     summary: Obtenir un passager par son numéro de téléphone
+ *
+ *     tags: [Passagers]
+ *
+ *     security:
+ *       - bearerAuth: []
+ *
+ *     parameters:
+ *
+ *       - in: path
+ *         name: phone
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "77000000"
+ *
+ *       - in: query
+ *         name: compagny_id
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *         description: Utilisé uniquement par SUPER_ADMIN
+ *
+ *
+ *     responses:
+ *
+ *       200:
+ *         description: Détails du passager
+ *
+ *       404:
+ *         description: Passager introuvable
  *
  *       403:
  *         description: Accès refusé

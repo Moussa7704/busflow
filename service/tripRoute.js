@@ -2,6 +2,7 @@ const { TripRoute } = require("../models");
 const BaseService = require("./base-service");
 const { Op } = require("sequelize");
 const roles = require("../constants/roles");
+const { assertCompagnyActive } = require("../utils/assertCompagnyActive");
 
 class TripRouteService extends BaseService {
     constructor() {
@@ -24,6 +25,8 @@ class TripRouteService extends BaseService {
 
             compagny_id = currentUser.compagny_id;
         }
+
+        await assertCompagnyActive(compagny_id);
 
         const exist = await this.model.findOne({
             where: {

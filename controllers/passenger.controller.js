@@ -96,6 +96,38 @@ const getPassengerById = async (req, res) => {
     }
 
 };
+const getPassengerByPhone = async (req, res) => {
+
+    try {
+        const passenger = await passengerService.getByPhone(
+            req.params.phone,
+            req.user,
+            req.query.compagny_id
+        );
+        if (!passenger) {
+            return sendResponse(res, {
+                success: false,
+                message: "Passager introuvable",
+                status: 404
+            });
+        }
+        return sendResponse(res, {
+            message: "Détails passager",
+            data: passenger,
+            status: 200
+        });
+
+    } catch (error) {
+
+        return sendResponse(res, {
+            success: false,
+            message: error.message,
+            status: 500
+        });
+
+    }
+
+};
 const updatePassenger = async (req, res) => {
 
     try {
@@ -125,5 +157,6 @@ module.exports = {
     createPassenger,
     listPassengers,
     getPassengerById,
+    getPassengerByPhone,
     updatePassenger
 }

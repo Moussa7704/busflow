@@ -195,6 +195,45 @@ const cancelTrip = async (req, res) => {
     }
 };
 
+const getTripManifestByRoute = async (req, res) => {
+
+    try {
+
+        const data = await tripService.getManifestByRoute(
+            {
+                route_id: req.query.route_id,
+                date: req.query.date,
+                time: req.query.time
+            },
+            req.user
+        );
+
+        return sendResponse(res, {
+
+            message: "Liste globale des passagers",
+
+            data,
+
+            status: 200
+
+        });
+
+    } catch (error) {
+
+        return sendResponse(res, {
+
+            success: false,
+
+            message: error.message,
+
+            status: 400
+
+        });
+
+    }
+
+};
+
 const getTripPassengers = async(req,res)=>{
 
     try {
@@ -243,5 +282,6 @@ module.exports = {
     deleteTrip,
     changeTripStatus,
     cancelTrip,
-    getTripPassengers
+    getTripPassengers,
+    getTripManifestByRoute
 }

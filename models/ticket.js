@@ -21,7 +21,9 @@ module.exports = (sequelize, DataTypes) => {
     ticket_number: DataTypes.STRING,
     compagny_id: DataTypes.INTEGER,
     qr_code: DataTypes.TEXT,
-    used: DataTypes.BOOLEAN
+    used: DataTypes.BOOLEAN,
+    status: DataTypes.STRING,
+    scanned_at: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'Ticket',

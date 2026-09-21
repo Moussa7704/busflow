@@ -19,8 +19,10 @@ const listRoles = async (req, res) => {
                     [Op.in]: [
                         //roles.AGENCY_ADMIN,
                         roles.AGENT,
+                        roles.CAISSIER,
                         roles.CONTROLLER,
-                        roles.DRIVER
+                        roles.DRIVER,
+                        roles.COURRIER
                     ]
                 };
                 break;
@@ -29,8 +31,10 @@ const listRoles = async (req, res) => {
                 where.name = {
                     [Op.in]: [
                         //roles.AGENT,
+                        roles.CAISSIER,
                         roles.CONTROLLER,
-                        roles.DRIVER
+                        roles.DRIVER,
+                        roles.COURRIER
                     ]
                 };
                 break;

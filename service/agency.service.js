@@ -1,11 +1,21 @@
 const { Agency } = require('../models');
 const BaseService = require("./base-service");
+const { assertCompagnyActive } = require("../utils/assertCompagnyActive");
 
 class AgencyService extends BaseService {
     constructor() {
         super(Agency)
     }
     async create(data) {
+
+        if (!data.compagny_id) {
+            throw new Error(
+                "La compagnie est obligatoire."
+            );
+        }
+
+        await assertCompagnyActive(data.compagny_id);
+
         const agency = await this.model.findOne({
             where: {
                 compagny_id: data.compagny_id,

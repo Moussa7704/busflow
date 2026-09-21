@@ -30,10 +30,10 @@
  *               email:
  *                 type: string
  *                 example: contact@busflow.ml
- *               phone:
+ *               telephone:
  *                 type: string
  *                 example: "+22370000000"
- *               address:
+ *               adresse:
  *                 type: string
  *                 example: Bamako
  *               status:

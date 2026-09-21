@@ -32,6 +32,20 @@ router.get(
     passengerController.listPassengers
 );
 
+// Récupérer un passager par son numéro de téléphone
+router.get(
+    "/phone/:phone",
+    authenticate,
+    authorize(
+        roles.SUPER_ADMIN,
+        roles.COMPAGNY_ADMIN,
+        roles.AGENCY_ADMIN,
+        roles.AGENT,
+        roles.CONTROLLER
+    ),
+    passengerController.getPassengerByPhone
+);
+
 // Détails d'un passager
 router.get(
     "/:id",

@@ -3,7 +3,8 @@ const BaseService = require("./base-service");
 const { Trip, Bus, TripRoute, User, Booking } = require("../models");
 
 const roles = require("../constants/roles");
-const { tripStatus } = require("../constants/status");
+const { tripStatus, bookingStatus } = require("../constants/status");
+const { assertCompagnyActive } = require("../utils/assertCompagnyActive");
 
 class TripService extends BaseService {
 
@@ -22,13 +23,15 @@ class TripService extends BaseService {
                 throw new Error("La compagnie est obligatoire.");
             }
 
-            compagny_id = data.compagny_id;
+            compagny_id = Number(data.compagny_id);
 
         } else {
 
             compagny_id = currentUser.compagny_id;
 
         }
+
+        await assertCompagnyActive(compagny_id);
 
         // ===========================
         // ROUTE
@@ -40,7 +43,7 @@ class TripService extends BaseService {
             throw new Error("Route introuvable.");
         }
 
-        if (route.compagny_id !== compagny_id) {
+        if (Number(route.compagny_id) !== compagny_id) {
             throw new Error("Cette route n'appartient pas à votre compagnie.");
         }
 
@@ -54,7 +57,7 @@ class TripService extends BaseService {
             throw new Error("Bus introuvable.");
         }
 
-        if (bus.compagny_id !== compagny_id) {
+        if (Number(bus.compagny_id) !== compagny_id) {
             throw new Error("Ce bus n'appartient pas à votre compagnie.");
         }
 
@@ -77,7 +80,7 @@ class TripService extends BaseService {
             throw new Error("Chauffeur introuvable.");
         }
 
-        if (driver.compagny_id !== compagny_id) {
+        if (Number(driver.compagny_id) !== compagny_id) {
             throw new Error("Le chauffeur n'appartient pas à cette compagnie.");
         }
 
@@ -98,6 +101,12 @@ class TripService extends BaseService {
             );
         }
 
+        if (departure < new Date()) {
+            throw new Error(
+                "La date de départ ne peut pas être dans le passé."
+            );
+        }
+
         // ===========================
         // BUS déjà affecté
         // ===========================
@@ -112,24 +121,12 @@ class TripService extends BaseService {
                         tripStatus.ARRIVED
                     ]
                 },
-                [Op.or]: [
-                    {
-                        departure_time: {
-                            [Op.between]: [
-                                departure,
-                                arrival
-                            ]
-                        }
-                    },
-                    {
-                        arrival_time: {
-                            [Op.between]: [
-                                departure,
-                                arrival
-                            ]
-                        }
-                    }
-                ]
+                departure_time: {
+                    [Op.lt]: arrival
+                },
+                arrival_time: {
+                    [Op.gt]: departure
+                }
             }
 
         });
@@ -157,27 +154,13 @@ class TripService extends BaseService {
                     ]
                 },
 
-                [Op.or]: [
+                departure_time: {
+                    [Op.lt]: arrival
+                },
 
-                    {
-                        departure_time: {
-                            [Op.between]: [
-                                departure,
-                                arrival
-                            ]
-                        }
-                    },
-
-                    {
-                        arrival_time: {
-                            [Op.between]: [
-                                departure,
-                                arrival
-                            ]
-                        }
-                    }
-
-                ]
+                arrival_time: {
+                    [Op.gt]: departure
+                }
 
             }
 
@@ -319,6 +302,12 @@ class TripService extends BaseService {
             );
         }
 
+        if (data.departure_time && departure < new Date()) {
+            throw new Error(
+                "La date de départ ne peut pas être dans le passé."
+            );
+        }
+
         const existingBusTrip = await Trip.findOne({
             where: {
                 id: {
@@ -331,18 +320,12 @@ class TripService extends BaseService {
                         tripStatus.ARRIVED
                     ]
                 },
-                [Op.or]: [
-                    {
-                        departure_time: {
-                            [Op.between]: [departure, arrival]
-                        }
-                    },
-                    {
-                        arrival_time: {
-                            [Op.between]: [departure, arrival]
-                        }
-                    }
-                ]
+                departure_time: {
+                    [Op.lt]: arrival
+                },
+                arrival_time: {
+                    [Op.gt]: departure
+                }
             }
         });
 
@@ -670,6 +653,116 @@ class TripService extends BaseService {
 
         };
 
+
+    }
+    async getManifestByRoute(filters, currentUser) {
+
+        const { route_id, date } = filters;
+
+        if (!route_id || !date) {
+            throw new Error("La route et la date sont obligatoires.");
+        }
+
+        const route = await TripRoute.findByPk(route_id);
+
+        if (!route) {
+            throw new Error("Route introuvable.");
+        }
+
+        if (
+            currentUser.role !== roles.SUPER_ADMIN &&
+            route.compagny_id !== currentUser.compagny_id
+        ) {
+            throw new Error("Accès refusé.");
+        }
+
+        const dayStart = new Date(date);
+        dayStart.setHours(0, 0, 0, 0);
+
+        const dayEnd = new Date(date);
+        dayEnd.setHours(23, 59, 59, 999);
+
+        const trips = await Trip.findAll({
+
+            where: {
+                route_id,
+                departure_time: {
+                    [Op.between]: [dayStart, dayEnd]
+                }
+            },
+
+            include: [
+                { association: "bus" },
+                { association: "Driver" }
+            ],
+
+            order: [["departure_time", "ASC"]]
+
+        });
+
+        const filteredTrips = filters.time
+            ? trips.filter((trip) => {
+                const d = new Date(trip.departure_time);
+                const hh = String(d.getHours()).padStart(2, "0");
+                const mm = String(d.getMinutes()).padStart(2, "0");
+                return `${hh}:${mm}` === filters.time;
+            })
+            : trips;
+
+        const tripsWithPassengers = await Promise.all(filteredTrips.map(async (trip) => {
+
+            const bookings = await Booking.findAll({
+
+                where: {
+                    trip_id: trip.id,
+                    status: bookingStatus.CONFIRMED
+                },
+
+                include: [
+                    {
+                        association: "passenger",
+                        attributes: ["id", "first_name", "last_name", "phone", "email"]
+                    }
+                ],
+
+                order: [["seat_number", "ASC"]]
+
+            });
+
+            return {
+                trip_id: trip.id,
+                departure_time: trip.departure_time,
+                arrival_time: trip.arrival_time,
+                status: trip.status,
+                bus: trip.bus,
+                driver: trip.Driver,
+                total_passengers: bookings.length,
+                passengers: bookings.map((item) => ({
+                    booking_id: item.id,
+                    seat_number: item.seat_number,
+                    booking_reference: item.booking_reference,
+                    passenger: item.passenger
+                }))
+            };
+
+        }));
+
+        const total_passengers = tripsWithPassengers.reduce(
+            (sum, t) => sum + t.total_passengers,
+            0
+        );
+
+        return {
+            route: {
+                id: route.id,
+                departure_city: route.departure_city,
+                arrival_city: route.arrival_city
+            },
+            date,
+            total_trips: tripsWithPassengers.length,
+            total_passengers,
+            trips: tripsWithPassengers
+        };
 
     }
 }

@@ -1,8 +1,10 @@
-const { Bus } = require('../models');
+const { Bus, Trip } = require('../models');
 const { Compagny } = require('../models');
 const BaseService = require('./base-service');
 const { Op } = require("sequelize")
 const roles = require('../constants/roles')
+const { busStatus, tripStatus } = require('../constants/status')
+const { assertCompagnyActive } = require('../utils/assertCompagnyActive')
 
 
 class BusService extends BaseService {
@@ -45,6 +47,13 @@ class BusService extends BaseService {
             throw new Error("La capacité du bus est invalide.");
         }
 
+        if (
+            data.status &&
+            !Object.values(busStatus).includes(data.status)
+        ) {
+            throw new Error("Statut du bus invalide.");
+        }
+
         let compagny_id;
 
         if (currentUser.role === roles.SUPER_ADMIN) {
@@ -60,6 +69,9 @@ class BusService extends BaseService {
             compagny_id = currentUser.compagny_id;
 
         }
+
+        await assertCompagnyActive(compagny_id);
+
         const payload = {
             compagny_id,
             plate_number: data.plate_number,
@@ -224,6 +236,31 @@ class BusService extends BaseService {
         // Capacité
         if (filters.capacity) {
             where.capacity = filters.capacity;
+        }
+
+        // Exclure les bus déjà affectés à un voyage en cours
+        if (filters.available_for_trip) {
+
+            const busyTrips = await Trip.findAll({
+                where: {
+                    status: {
+                        [Op.notIn]: [
+                            tripStatus.CANCELLED,
+                            tripStatus.ARRIVED
+                        ]
+                    }
+                },
+                attributes: ["bus_id"]
+            });
+
+            const busyBusIds = busyTrips.map((trip) => trip.bus_id);
+
+            if (busyBusIds.length > 0) {
+                where.id = {
+                    [Op.notIn]: busyBusIds
+                };
+            }
+
         }
 
         return await super.Paginate(

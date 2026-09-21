@@ -2,6 +2,7 @@ const { User, Agency } = require("../models");
 const BaseService = require("./base-service");
 const bcrypt = require("bcrypt");
 const { Op } = require("sequelize")
+const { assertCompagnyActive } = require("../utils/assertCompagnyActive")
 
 class UserService extends BaseService {
     constructor() {
@@ -28,19 +29,21 @@ class UserService extends BaseService {
                 throw new Error("La compagnie est obligatoire.");
             }
 
-            compagny_id = data.compagny_id;
+            compagny_id = Number(data.compagny_id);
 
         } else {
 
             compagny_id = currentUser.compagny_id;
         }
 
+        await assertCompagnyActive(compagny_id);
+
         // Vérifier agence appartient à la compagnie
         if (data.agency_id) {
 
             const agency = await Agency.findByPk(data.agency_id);
 
-            if (!agency || agency.compagny_id !== compagny_id) {
+            if (!agency || Number(agency.compagny_id) !== Number(compagny_id)) {
                 throw new Error("Agence invalide pour cette compagnie.");
             }
         }
